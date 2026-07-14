@@ -1,4 +1,4 @@
-function roomHandler(io, socket) {
+function roomHandle(io, socket) {
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
     socket.data.roomId = roomId;
@@ -21,4 +21,4 @@ function roomHandler(io, socket) {
   });
 }
 
-module.exports = roomHandler;
+module.exports = roomHandle;
