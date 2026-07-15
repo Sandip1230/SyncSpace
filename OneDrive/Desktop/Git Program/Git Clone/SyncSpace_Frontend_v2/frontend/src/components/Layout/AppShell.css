@@ -1,0 +1,87 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
+.app-shell__stage {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Both panels are always in the flow; only flex-basis, opacity and
+   pointer-events change between modes. flex-grow/shrink stay pinned to 0
+   so sizing is driven purely by flex-basis, which keeps the transition
+   predictable whether the stage is laid out as a row (desktop split) or
+   a column (mobile split, see media query below). */
+.stage-panel {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 0%;
+  overflow: hidden;
+  opacity: 0;
+  transition: flex-basis var(--duration-slow) var(--ease),
+    opacity var(--duration-med) var(--ease);
+}
+
+.stage-panel--code {
+  border-right: 0 solid var(--border-subtle);
+  transition: flex-basis var(--duration-slow) var(--ease),
+    opacity var(--duration-med) var(--ease), border-color var(--duration-fast) var(--ease);
+}
+
+/* ---- code mode: editor full width, board collapsed ---- */
+.stage--code .stage-panel--code {
+  flex-basis: 100%;
+  opacity: 1;
+}
+.stage--code .stage-panel--board {
+  flex-basis: 0%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- split mode: both panels share the stage ---- */
+.stage--split .stage-panel--code {
+  flex-basis: 50%;
+  opacity: 1;
+  border-right-width: 1px;
+}
+.stage--split .stage-panel--board {
+  flex-basis: 50%;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---- annotate mode: board full width/height, editor collapsed ---- */
+.stage--annotate .stage-panel--code {
+  flex-basis: 0%;
+  opacity: 0;
+  pointer-events: none;
+}
+.stage--annotate .stage-panel--board {
+  flex-basis: 100%;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---- narrow screens: split stacks vertically instead of squeezing
+   two side-by-side panels below a usable width ---- */
+@media (max-width: 860px) {
+  .stage--split {
+    flex-direction: column;
+  }
+  .stage--split .stage-panel--code {
+    border-right-width: 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+}

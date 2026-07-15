@@ -1,0 +1,78 @@
+/*
+  SyncSpace — Design Tokens
+  ---------------------------------------------------
+  70 / 20 / 10 color distribution:
+    70%  --bg-primary / --bg-primary-elevated   (dominant dark canvas)
+    20%  --bg-panel / --bg-panel-raised / --border-subtle  (structural surfaces)
+    10%  --accent / --success / --warning / --danger        (interactive + status)
+*/
+
+:root {
+  /* ---- 70%: dominant surface ---- */
+  --bg-primary: #0b1526;
+  --bg-primary-elevated: #0e1c33;
+
+  /* ---- 20%: structural / panel surfaces ---- */
+  --bg-panel: #121e36;
+  --bg-panel-raised: #17253f;
+  --bg-panel-hover: #1c2c4a;
+  --border-subtle: #223252;
+  --border-strong: #2c3f66;
+
+  /* ---- 10%: accent + semantic (used sparingly, on purpose) ---- */
+  --accent: #3fc6d6;
+  --accent-strong: #5cd6e4;
+  --accent-soft: rgba(63, 198, 214, 0.14);
+  --success: #3ddc97;
+  --success-soft: rgba(61, 220, 151, 0.14);
+  --warning: #f2b134;
+  --warning-soft: rgba(242, 177, 52, 0.14);
+  --danger: #ff6b6b;
+  --danger-soft: rgba(255, 107, 107, 0.14);
+
+  /* ---- text ---- */
+  --text-primary: #e7edf7;
+  --text-secondary: #a9b8d4;
+  --text-muted: #6f80a3;
+  --text-on-accent: #06181d;
+
+  /* ---- type ---- */
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", "Fira Code", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  /* Global type scale multiplier, adjustable from Settings. Every
+     component font-size is written as calc(var(--font-scale) * Npx) so
+     one slider rescales the whole UI (Monaco's own font size is handled
+     separately via editor options, since it isn't CSS-driven). */
+  --font-scale: 1;
+
+  /* ---- radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* ---- shadow ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+
+  /* ---- motion ---- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-med: 220ms;
+  --duration-slow: 360ms;
+
+  /* ---- layout ---- */
+  --header-height: 56px;
+  --toolbar-width: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-med: 0ms;
+    --duration-slow: 0ms;
+  }
+}
