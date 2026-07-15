@@ -12,7 +12,7 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  roomHandler(io, socket);
+  roomHandle(io, socket);
 });
 
 const PORT = process.env.PORT || 3001;
