@@ -11,7 +11,6 @@ function roomHandle(io, socket) {
     console.log(`Socket ${socket.id} left room ${roomId}`);
     socket.to(roomId).emit('userLeft', { socketId: socket.id });
   });
-
   socket.on('disconnect', () => {
     const roomId = socket.data.roomId;
     if (roomId) {
@@ -20,5 +19,4 @@ function roomHandle(io, socket) {
     console.log(`User disconnected: ${socket.id}`);
   });
 }
-
 module.exports = roomHandle;
