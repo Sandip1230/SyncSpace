@@ -31,7 +31,7 @@ function App() {
       {/* RIGHT PANE: Code Editor Placeholder */}
       <div style={{ flex: 1, backgroundColor: '#1e1e1e', color: '#ffffff', padding: '1rem' }}>
         <h3>Monaco Code Editor Pane (VS Code Engine Placeholder)</h3>
-        <p style={{ color: '#888' }}>
+        <p style={{ color: '#888' }}>Status: Structural Shell Initialized</p>
       </div>
     </div>
   );
