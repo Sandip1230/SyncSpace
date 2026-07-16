@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const Y = require('yjs');
+const registerSocketHandlers = require('./sockets');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,7 +12,9 @@ const io = new Server(server, { cors: { origin: "*" } });
 const activeSpaces = new Map();
 
 io.on('connection', (socket) => {
-  
+
+  registerSocketHandlers(io, socket);
+
   socket.on('space:join', ({ spaceId, username }) => {
     socket.join(spaceId);
     
