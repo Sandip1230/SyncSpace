@@ -1,40 +1,51 @@
-const rooms = {}; // { roomId: Set of socketIds }
+const { getOrCreateRoom, getRoom, listUsers, scheduleEvictionIfEmpty } = require("./roomStore");
 
-function roomHandle(io, socket) {
-  socket.on('joinRoom', (roomId) => {
+/**
+ * Handles room membership: join, leave, and disconnect cleanup, plus
+ * broadcasting presence (who's here) to everyone in the room.
+ */
+function roomHandler(io, socket) {
+  socket.on("room:join", ({ roomId, username }) => {
+    if (!roomId) return;
+
     socket.join(roomId);
     socket.data.roomId = roomId;
+    socket.data.username = username || "Anonymous";
 
-    // Track this user in the room
-    if (!rooms[roomId]) {
-      rooms[roomId] = new Set();
-    }
-    rooms[roomId].add(socket.id);
+    const room = getOrCreateRoom(roomId);
+    room.users.set(socket.id, { username: socket.data.username });
 
-    console.log(`Socket ${socket.id} joined room ${roomId}`);
-
-    // Send the new joiner the current list of users already in the room
-    socket.emit('roomUsers', Array.from(rooms[roomId]));
-
-    // Notify everyone else that someone new joined
-    socket.to(roomId).emit('userJoined', { socketId: socket.id });
+    // Tell the joiner who's already here.
+    socket.emit("room:users", listUsers(roomId));
+    // Tell everyone else someone new arrived.
+    socket.to(roomId).emit("room:user-joined", {
+      socketId: socket.id,
+      username: socket.data.username,
+    });
   });
 
-  socket.on('leaveRoom', (roomId) => {
-    socket.leave(roomId);
-    rooms[roomId]?.delete(socket.id);
-    console.log(`Socket ${socket.id} left room ${roomId}`);
-    socket.to(roomId).emit('userLeft', { socketId: socket.id });
+  socket.on("room:leave", () => {
+    leaveCurrentRoom(socket);
   });
 
-  socket.on('disconnect', () => {
-    const roomId = socket.data.roomId;
-    if (roomId && rooms[roomId]) {
-      rooms[roomId].delete(socket.id);
-      socket.to(roomId).emit('userLeft', { socketId: socket.id });
-    }
-    console.log(`User disconnected: ${socket.id}`);
+  socket.on("disconnect", () => {
+    leaveCurrentRoom(socket);
   });
+}
+
+function leaveCurrentRoom(socket) {
+  const roomId = socket.data.roomId;
+  if (!roomId) return;
+
+  const room = getRoom(roomId);
+  if (room) {
+    room.users.delete(socket.id);
+    socket.to(roomId).emit("room:user-left", { socketId: socket.id });
+    scheduleEvictionIfEmpty(roomId);
+  }
+
+  socket.leave(roomId);
+  socket.data.roomId = null;
 }
 
 module.exports = roomHandler;
