@@ -2,9 +2,9 @@ const Y = require("yjs");
 const { getOrCreateRoom, getRoom } = require("./roomStore");
 
 function yjsHandler(io, socket) {
-  socket.on("room:join", ({ roomId }) => {
+  socket.on("room:join", async ({ roomId }) => {
     if (!roomId) return;
-    const room = getOrCreateRoom(roomId);
+    const room = await getOrCreateRoom(roomId);
     socket.emit("yjs:sync", Buffer.from(Y.encodeStateAsUpdate(room.doc)));
   });
 
