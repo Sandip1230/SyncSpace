@@ -6,17 +6,13 @@ import { SOCKET_EVENTS } from "../utils/constants";
 export function useYDoc(roomId) {
   const ydoc = useMemo(() => new Y.Doc(), [roomId]);
   const ytext = useMemo(() => ydoc.getText("code"), [ydoc]);
+  const yshapes = useMemo(() => ydoc.getArray("shapes"), [ydoc]);
 
   useEffect(() => {
     if (!roomId) return undefined;
 
-    const onSync = (state) => {
-      Y.applyUpdate(ydoc, new Uint8Array(state));
-    };
-    const onUpdate = (update) => {
-      Y.applyUpdate(ydoc, new Uint8Array(update));
-    };
-    // Local edits -> relay to the server, which broadcasts to everyone else.
+    const onSync = (state) => Y.applyUpdate(ydoc, new Uint8Array(state));
+    const onUpdate = (update) => Y.applyUpdate(ydoc, new Uint8Array(update));
     const onLocalUpdate = (update, origin) => {
       if (origin === "remote") return;
       socket.emit(SOCKET_EVENTS.YJS_UPDATE, { roomId, update });
@@ -34,5 +30,5 @@ export function useYDoc(roomId) {
     };
   }, [ydoc, roomId]);
 
-  return { ydoc, ytext };
+  return { ydoc, ytext, yshapes };
 }
