@@ -2,17 +2,22 @@ import { useEffect, useMemo } from "react";
 import * as Y from "yjs";
 import socket from "../services/socket";
 import { SOCKET_EVENTS } from "../utils/constants";
+import { createUndoManager } from "../lib/yShapes";
 
 export function useYDoc(roomId) {
   const ydoc = useMemo(() => new Y.Doc(), [roomId]);
   const ytext = useMemo(() => ydoc.getText("code"), [ydoc]);
   const yshapes = useMemo(() => ydoc.getArray("shapes"), [ydoc]);
+  const undoManager = useMemo(() => createUndoManager(yshapes), [yshapes]);
 
   useEffect(() => {
     if (!roomId) return undefined;
 
-    const onSync = (state) => Y.applyUpdate(ydoc, new Uint8Array(state));
-    const onUpdate = (update) => Y.applyUpdate(ydoc, new Uint8Array(update));
+    // Tag remote-applied updates with a non-null origin so the local
+    // UndoManager (trackedOrigins = [null]) never tracks them — fixes a
+    // bug where Undo could revert someone else's edit.
+    const onSync = (state) => Y.applyUpdate(ydoc, new Uint8Array(state), "remote");
+    const onUpdate = (update) => Y.applyUpdate(ydoc, new Uint8Array(update), "remote");
     const onLocalUpdate = (update, origin) => {
       if (origin === "remote") return;
       socket.emit(SOCKET_EVENTS.YJS_UPDATE, { roomId, update });
@@ -26,9 +31,10 @@ export function useYDoc(roomId) {
       socket.off(SOCKET_EVENTS.YJS_SYNC, onSync);
       socket.off(SOCKET_EVENTS.YJS_UPDATE, onUpdate);
       ydoc.off("update", onLocalUpdate);
+      undoManager.destroy();
       ydoc.destroy();
     };
-  }, [ydoc, roomId]);
+  }, [ydoc, roomId, undoManager]);
 
-  return { ydoc, ytext, yshapes };
+  return { ydoc, ytext, yshapes, undoManager };
 }
