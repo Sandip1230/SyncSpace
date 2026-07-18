@@ -1,19 +1,40 @@
+const Y = require("yjs");
+const Space = require("../models/Space");
+
 const AUTOSAVE_INTERVAL_MS = 15000;
 let autosaveTimer = null;
 
-async function loadState() {
-  return null;
+async function loadState(roomId) {
+  try {
+    const record = await Space.findOne({ spaceId: roomId }).lean();
+    return record ? record.documentState : null;
+  } catch (err) {
+    console.error(`Failed to load persisted state for room ${roomId}:`, err.message);
+    return null;
+  }
 }
 
-async function saveState() {
-  return null;
+async function saveState(roomId, doc) {
+  try {
+    const state = Buffer.from(Y.encodeStateAsUpdate(doc));
+    await Space.updateOne(
+      { spaceId: roomId },
+      { $set: { documentState: state, lastSavedAt: new Date() } },
+      { upsert: true }
+    );
+  } catch (err) {
+    console.error(`Failed to persist room ${roomId}:`, err.message);
+  }
 }
 
 function startAutosave(rooms) {
   if (autosaveTimer) return;
   autosaveTimer = setInterval(async () => {
-    for (const room of rooms.values()) {
-      room.dirty = false;
+    for (const [roomId, room] of rooms.entries()) {
+      if (room.dirty) {
+        room.dirty = false;
+        await saveState(roomId, room.doc);
+      }
     }
   }, AUTOSAVE_INTERVAL_MS);
   autosaveTimer.unref?.();
@@ -24,8 +45,15 @@ function stopAutosave() {
   autosaveTimer = null;
 }
 
-async function flushAll() {
-  return null;
+async function flushAll(rooms) {
+  const saves = [];
+  for (const [roomId, room] of rooms.entries()) {
+    if (room.dirty) {
+      room.dirty = false;
+      saves.push(saveState(roomId, room.doc));
+    }
+  }
+  await Promise.all(saves);
 }
 
 module.exports = { loadState, saveState, startAutosave, stopAutosave, flushAll };

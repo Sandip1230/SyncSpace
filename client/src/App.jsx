@@ -1,25 +1,17 @@
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
-import Toolbar from "./components/Toolbar";
-import Whiteboard from "./components/Whiteboard";
-import CodeEditor from "./components/CodeEditor";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import CreateRoom from "./pages/CreateRoom";
+import JoinRoom from "./pages/JoinRoom";
+import Workspace from "./pages/Workspace";
 
 function App() {
   return (
-    <>
-      <Navbar />
-
-      <div style={{ display: "flex", height: "90vh" }}>
-        <Sidebar />
-
-        <div style={{ flex: 1 }}>
-          <Toolbar />
-          <Whiteboard />
-        </div>
-
-        <CodeEditor />
-      </div>
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/create" element={<CreateRoom />} />
+      <Route path="/join" element={<JoinRoom />} />
+      <Route path="/workspace/:roomId" element={<Workspace />} />
+    </Routes>
   );
 }
 
