@@ -1,0 +1,37 @@
+.wb-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #1f2937;
+  border-bottom: 1px solid #2c3f66;
+  color: #e7edf7;
+  flex-wrap: wrap;
+}
+.wb-toolbar__group { display: flex; align-items: center; gap: 4px; }
+.wb-toolbar__divider { width: 1px; height: 22px; background: #2c3f66; margin: 0 6px; }
+.wb-toolbar__spacer { flex: 1; }
+.wb-tool {
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+  color: #a9b8d4; cursor: pointer;
+}
+.wb-tool:hover { background: #2c3f6680; color: #fff; }
+.wb-tool.is-active { background: #3fc6d633; border-color: #3fc6d6; color: #3fc6d6; }
+.wb-tool--danger:hover { background: #ff6b6b33; color: #ff6b6b; }
+.wb-tool--close { color: #a9b8d4; }
+.wb-swatch {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer; padding: 0;
+}
+.wb-swatch.is-active { border-color: #e7edf7; }
+.wb-swatch--custom { overflow: hidden; border: 1px dashed #6f80a3; }
+.wb-swatch--custom input { width: 28px; height: 28px; margin: -3px; cursor: pointer; }
+.wb-width {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+}
+.wb-width.is-active { border-color: #3fc6d6; }
+.wb-width span { display: block; border-radius: 50%; background: #e7edf7; }

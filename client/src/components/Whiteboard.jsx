@@ -2,6 +2,8 @@ import { Stage, Layer, Line } from "react-konva";
 import { useEffect, useState } from "react";
 import { addShape, clearShapes, undoLastShape, updateLastShape } from "../lib/yShapes";
 
+const DRAWABLE_TOOLS = ["pen", "eraser"];
+
 function Whiteboard({ yshapes, tool, color, strokeWidth, registerActions }) {
   const [shapes, setShapes] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -14,7 +16,6 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, registerActions }) {
     return () => yshapes.unobserve(sync);
   }, [yshapes]);
 
-  // Exposes clear/undo to the parent so Toolbar's buttons can drive this board.
   useEffect(() => {
     if (!registerActions || !yshapes) return;
     registerActions({
@@ -24,10 +25,13 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, registerActions }) {
   }, [registerActions, yshapes]);
 
   const handleMouseDown = (e) => {
-    if (tool !== "pen" || !yshapes) return;
+    if (!DRAWABLE_TOOLS.includes(tool) || !yshapes) return;
     setIsDrawing(true);
     const pos = e.target.getStage().getPointerPosition();
-    addShape(yshapes, { id: `${Date.now()}_${Math.random()}`, tool, color, strokeWidth, points: [pos.x, pos.y] });
+    // Eraser strokes are a fair bit fatter than the pen so a single drag
+    // actually clears the width it visually covers, not just a hairline.
+    const width = tool === "eraser" ? strokeWidth * 4 : strokeWidth;
+    addShape(yshapes, { id: `${Date.now()}_${Math.random()}`, tool, color, strokeWidth: width, points: [pos.x, pos.y] });
   };
 
   const handleMouseMove = (e) => {
@@ -41,10 +45,25 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, registerActions }) {
   const handleMouseUp = () => setIsDrawing(false);
 
   return (
-    <Stage width={window.innerWidth * 0.6} height={window.innerHeight * 0.85} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
+    <Stage
+      width={window.innerWidth * 0.6}
+      height={window.innerHeight * 0.85}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
       <Layer>
         {shapes.map((s) => (
-          <Line key={s.id} points={s.points} stroke={s.color} strokeWidth={s.strokeWidth} tension={0.5} lineCap="round" lineJoin="round" />
+          <Line
+            key={s.id}
+            points={s.points}
+            stroke={s.tool === "eraser" ? "#000" : s.color}
+            strokeWidth={s.strokeWidth}
+            tension={s.tool === "eraser" ? 0 : 0.5}
+            lineCap="round"
+            lineJoin="round"
+            globalCompositeOperation={s.tool === "eraser" ? "destination-out" : "source-over"}
+          />
         ))}
       </Layer>
     </Stage>
