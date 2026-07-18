@@ -1,13 +1,13 @@
 const Y = require("yjs");
-const RoomDoc = require("../models/RoomDoc");
+const Space = require("../models/Space");
 
 const AUTOSAVE_INTERVAL_MS = 15000;
 let autosaveTimer = null;
 
 async function loadState(roomId) {
   try {
-    const record = await RoomDoc.findOne({ roomId }).lean();
-    return record ? record.state : null;
+    const record = await Space.findOne({ spaceId: roomId }).lean();
+    return record ? record.documentState : null;
   } catch (err) {
     console.error(`Failed to load persisted state for room ${roomId}:`, err.message);
     return null;
@@ -17,13 +17,16 @@ async function loadState(roomId) {
 async function saveState(roomId, doc) {
   try {
     const state = Buffer.from(Y.encodeStateAsUpdate(doc));
-    await RoomDoc.updateOne({ roomId }, { $set: { state, updatedAt: new Date() } }, { upsert: true });
+    await Space.updateOne(
+      { spaceId: roomId },
+      { $set: { documentState: state, lastSavedAt: new Date() } },
+      { upsert: true }
+    );
   } catch (err) {
     console.error(`Failed to persist room ${roomId}:`, err.message);
   }
 }
 
-// One global interval covers every active room rather than a timer per room.
 function startAutosave(rooms) {
   if (autosaveTimer) return;
   autosaveTimer = setInterval(async () => {
