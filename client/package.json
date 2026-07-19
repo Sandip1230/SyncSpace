@@ -18,10 +18,10 @@
     "react-konva": "^19.2.5",
     "react-router-dom": "^7.18.1",
     "socket.io-client": "^4.8.3",
-    "y-websocket": "^3.0.0",
-    "yjs": "^13.6.31",
     "y-monaco": "^0.1.6",
-    "y-protocols": "^1.0.6"
+    "y-protocols": "^1.0.7",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.31"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -1,7 +1,7 @@
 const Y = require("yjs");
 const { loadState, saveState, startAutosave } = require("./persistence");
 
-const rooms = new Map(); // roomId -> { doc, users, dirty }
+const rooms = new Map();
 const loadingPromises = new Map();
 
 const EMPTY_ROOM_TTL_MS = 5 * 60 * 1000;
@@ -14,7 +14,7 @@ async function getOrCreateRoom(roomId) {
   let room = rooms.get(roomId);
   if (room) {
     const pending = loadingPromises.get(roomId);
-    if (pending) await pending; // concurrent join mid-load — wait for the same load
+    if (pending) await pending;
     return room;
   }
 
@@ -24,8 +24,15 @@ async function getOrCreateRoom(roomId) {
 
   const loadPromise = (async () => {
     const persisted = await loadState(roomId);
-    if (persisted) Y.applyUpdate(doc, persisted);
-    // Attached after applying persisted state so loading doesn't itself mark dirty.
+    if (persisted) {
+      try {
+        Y.applyUpdate(doc, Buffer.isBuffer(persisted) ? persisted : Buffer.from(persisted));
+      } catch (err) {
+        // A corrupted/incompatible saved document must never crash the
+        // server — worst case, that room starts empty instead of restored.
+        console.error(`Corrupted persisted state for room "${roomId}", starting fresh:`, err.message);
+      }
+    }
     doc.on("update", () => { room.dirty = true; });
   })();
   loadingPromises.set(roomId, loadPromise);
