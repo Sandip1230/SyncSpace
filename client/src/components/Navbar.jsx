@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from "./Logo";
 import "./Navbar.css";
 
 const MODES = [
@@ -23,6 +24,7 @@ function Navbar({ roomId, mode, onModeChange }) {
   return (
     <div className="navbar">
       <Link to="/" className="navbar__brand">
+        <Logo />
         <h2>SyncSpace</h2>
       </Link>
 
@@ -30,11 +32,7 @@ function Navbar({ roomId, mode, onModeChange }) {
         <div className="mode-toggle" style={{ "--mode-count": MODES.length, "--mode-index": activeIndex }}>
           <span className="mode-toggle__indicator" />
           {MODES.map((m) => (
-            <button
-              key={m.key}
-              className={`mode-toggle__btn ${mode === m.key ? "is-active" : ""}`}
-              onClick={() => onModeChange(m.key)}
-            >
+            <button key={m.key} className={`mode-toggle__btn ${mode === m.key ? "is-active" : ""}`} onClick={() => onModeChange(m.key)}>
               {m.label}
             </button>
           ))}
