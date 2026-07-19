@@ -1,11 +1,15 @@
 const { getOrCreateRoom, getRoom, listUsers, scheduleEvictionIfEmpty } = require("./roomStore");
+const { isValidRoomId, sanitizeUsername } = require("./validators");
 
 function roomHandler(io, socket) {
   socket.on("room:join", async ({ roomId, username }) => {
-    if (!roomId) return;
+    if (!isValidRoomId(roomId)) {
+      socket.emit("room:error", { message: "Invalid room ID." });
+      return;
+    }
     socket.join(roomId);
     socket.data.roomId = roomId;
-    socket.data.username = username || "Anonymous";
+    socket.data.username = sanitizeUsername(username);
 
     const room = await getOrCreateRoom(roomId);
     room.users.set(socket.id, { username: socket.data.username });
