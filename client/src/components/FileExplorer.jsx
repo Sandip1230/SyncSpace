@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { SiJavascript, SiTypescript, SiPython, SiJson, SiMarkdown, SiCss3, SiHtml5 } from "react-icons/si";
+import { SiJavascript, SiTypescript, SiPython, SiJson, SiMarkdown, SiCss, SiHtml5 } from "react-icons/si";
 import { VscFile, VscFolder, VscFolderOpened, VscChevronRight, VscNewFile, VscNewFolder, VscSearch } from "react-icons/vsc";
 import "./FileExplorer.css";
 
@@ -7,7 +7,7 @@ const ICONS = {
   js: { Icon: SiJavascript, color: "#f2b134" }, jsx: { Icon: SiJavascript, color: "#f2b134" },
   ts: { Icon: SiTypescript, color: "#3fc6d6" }, tsx: { Icon: SiTypescript, color: "#3fc6d6" },
   py: { Icon: SiPython, color: "#3ddc97" }, json: { Icon: SiJson, color: "#c77dff" },
-  md: { Icon: SiMarkdown, color: "#a9b8d4" }, css: { Icon: SiCss3, color: "#ff6b6b" }, html: { Icon: SiHtml5, color: "#f2b134" },
+  md: { Icon: SiMarkdown, color: "#a9b8d4" },css: { Icon: SiCss, color: "#ff6b6b" }, html: { Icon: SiHtml5, color: "#f2b134" },
 };
 
 export function FileIcon({ name, size = 18 }) {
