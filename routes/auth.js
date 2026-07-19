@@ -10,7 +10,28 @@ const router = express.Router();
 function generateOtp() {
   return crypto.randomInt(100000, 999999).toString();
 }
+router.post("/login", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const identifier = username || email;
+    if (!identifier || !password) {
+      return res.status(400).json({ error: "Username/email and password required" });
+    }
 
+    const user = await User.findOne({ $or: [{ username: identifier }, { email: identifier }] });
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    if (!user.isVerified) return res.status(403).json({ error: "Please verify your email first" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    res.json({ token, username: user.username });
+  } catch (err) {
+    console.error("Login error:", err.message);
+    res.status(500).json({ error: "Server error during login" });
+  }
+});
 router.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;

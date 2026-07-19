@@ -10,10 +10,28 @@ async function handle(res) {
 
 export async function createRoom() {
   const res = await fetch(`${API_BASE_URL}/rooms`, { method: "POST" });
-  return handle(res); // { roomId }
+  return handle(res);
 }
 
 export async function getRoom(roomId) {
   const res = await fetch(`${API_BASE_URL}/rooms/${roomId}`);
-  return handle(res); // { roomId, active, userCount }
+  return handle(res);
+}
+
+export async function loginRequest(identifier, password) {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username: identifier, email: identifier, password }),
+  });
+  return handle(res);
+}
+
+export async function signupRequest(username, email, password) {
+  const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, email, password }),
+  });
+  return handle(res);
 }
