@@ -10,7 +10,7 @@ const ICONS = {
   md: { Icon: SiMarkdown, color: "#a9b8d4" }, css: { Icon: SiCss3, color: "#ff6b6b" }, html: { Icon: SiHtml5, color: "#f2b134" },
 };
 
-function FileIcon({ name, size = 18 }) {
+export function FileIcon({ name, size = 18 }) {
   const ext = name.includes(".") ? name.split(".").pop().toLowerCase() : "";
   const entry = ICONS[ext];
   if (entry) return <entry.Icon size={size} color={entry.color} />;

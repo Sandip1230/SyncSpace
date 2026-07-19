@@ -1,18 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { MonacoBinding } from "y-monaco";
-import { Awareness } from "y-protocols/awareness.js";
-import FileExplorer from "./FileExplorer";
+import FileExplorer, { FileIcon } from "./FileExplorer";
 import Terminal from "./Terminal";
 import { isRunnable } from "../lib/fileTree";
 import "./CodeEditor.css";
 
-function CodeEditor({ ydoc, fileSystem }) {
+function CodeEditor({ ydoc, fileSystem, awareness }) {
   const { activeFile, activeFileId, activeText } = fileSystem;
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
   const bindingRef = useRef(null);
-  const awarenessRef = useRef(null);
 
   const [explorerOpen, setExplorerOpen] = useState(true);
   const [terminalOpen, setTerminalOpen] = useState(false);
@@ -24,24 +22,23 @@ function CodeEditor({ ydoc, fileSystem }) {
   const handleMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    awarenessRef.current = new Awareness(ydoc);
   };
 
   useEffect(() => {
     const editor = editorRef.current;
     const monaco = monacoRef.current;
-    if (!editor || !monaco || !activeText) return undefined;
+    if (!editor || !monaco || !activeText || !awareness) return undefined;
 
     bindingRef.current?.destroy();
     const model = editor.getModel();
     monaco.editor.setModelLanguage(model, language);
-    bindingRef.current = new MonacoBinding(activeText, model, new Set([editor]), awarenessRef.current);
+    bindingRef.current = new MonacoBinding(activeText, model, new Set([editor]), awareness);
 
     return () => bindingRef.current?.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFileId, activeText]);
+  }, [activeFileId, activeText, awareness]);
 
-  useEffect(() => () => { bindingRef.current?.destroy(); awarenessRef.current?.destroy(); }, []);
+  useEffect(() => () => bindingRef.current?.destroy(), []);
 
   const handleRun = () => {
     if (!activeText || !runnable) return;
@@ -56,19 +53,13 @@ function CodeEditor({ ydoc, fileSystem }) {
       <div className="code-editor__main">
         <div className="code-editor__tabbar">
           <div className="code-editor__file-label">
-            {!explorerOpen && (
-              <button className="fx-icon-btn" onClick={() => setExplorerOpen(true)} title="Show explorer">▶</button>
-            )}
+            {!explorerOpen && <button className="fx-icon-btn" onClick={() => setExplorerOpen(true)} title="Show explorer">▶</button>}
             {activeFile && <FileIcon name={activeFile.name} size={14} />}
             <span>{activeFile ? activeFile.name : "No file open"}</span>
           </div>
           <div className="code-editor__tools">
-            <button className="btn-run" onClick={handleRun} disabled={!runnable} title={runnable ? "Run in-browser" : "JS/TS only"}>
-              ▶ Run
-            </button>
-            <button className={`btn-terminal ${terminalOpen ? "is-active" : ""}`} onClick={() => setTerminalOpen((v) => !v)}>
-              Terminal
-            </button>
+            <button className="btn-run" onClick={handleRun} disabled={!runnable} title={runnable ? "Run in-browser" : "JS/TS only"}>▶ Run</button>
+            <button className={`btn-terminal ${terminalOpen ? "is-active" : ""}`} onClick={() => setTerminalOpen((v) => !v)}>Terminal</button>
           </div>
         </div>
 

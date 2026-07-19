@@ -18,7 +18,7 @@ function Workspace() {
   const [username] = useState(getStoredUsername() || randomGuestName());
 
   const { connecting, users, error } = useSocket(roomId, username);
-  const { ydoc, fileTreeMap, yshapes, undoManager } = useYDoc(roomId);
+  const { ydoc, fileTreeMap, yshapes, undoManager, awareness } = useYDoc(roomId, username);
   const fileSystem = useFileSystem(ydoc, fileTreeMap);
 
   const [mode, setMode] = useState("split");
@@ -44,7 +44,7 @@ function Workspace() {
           <Sidebar roomId={roomId} users={users} connected={!connecting} />
 
           <div className="workspace-panel workspace-panel--editor">
-            <CodeEditor ydoc={ydoc} fileSystem={fileSystem} />
+            <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
           </div>
 
           <div className="workspace-panel workspace-panel--whiteboard">
