@@ -1,0 +1,18 @@
+:root {
+  --bg-primary: #0b1526;
+  --bg-panel: #1f2937;
+  --bg-panel-raised: #2c3f66;
+  --border-subtle: #2c3f66;
+  --text-primary: #e7edf7;
+  --text-secondary: #a9b8d4;
+  --accent: #3fc6d6;
+  --accent-strong: #56d3e1;
+  --success: #3ddc97;
+  --danger: #ff6b6b;
+  --radius-sm: 6px;
+  --radius-pill: 999px;
+  --duration-fast: 0.15s;
+  --duration-med: 0.25s;
+  --duration-slow: 0.35s;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}

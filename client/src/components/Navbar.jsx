@@ -1,26 +1,54 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import "./Navbar.css";
 
-function Navbar({ roomId }) {
+const MODES = [
+  { key: "editor", label: "Editor" },
+  { key: "split", label: "Split" },
+  { key: "whiteboard", label: "Whiteboard" },
+];
+
+function Navbar({ roomId, mode, onModeChange }) {
   const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
 
   const handleShare = () => {
     navigator.clipboard?.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
 
+  const activeIndex = Math.max(0, MODES.findIndex((m) => m.key === mode));
+
   return (
-    <div style={{ height: "60px", background: "#1f2937", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 20px" }}>
-      <Link to="/" style={{ color: "white", textDecoration: "none" }}>
-        <h2 style={{ margin: 0 }}>SyncSpace</h2>
+    <div className="navbar">
+      <Link to="/" className="navbar__brand">
+        <h2>SyncSpace</h2>
       </Link>
 
-      <div style={{ display: "flex", gap: "15px" }}>
-        <button onClick={() => navigate("/create")}>Create Room</button>
-        <button onClick={() => navigate("/join")}>Join Room</button>
-        {roomId && <button onClick={handleShare}>Share</button>}
-      </div>
+      {roomId && onModeChange && (
+        <div className="mode-toggle" style={{ "--mode-count": MODES.length, "--mode-index": activeIndex }}>
+          <span className="mode-toggle__indicator" />
+          {MODES.map((m) => (
+            <button
+              key={m.key}
+              className={`mode-toggle__btn ${mode === m.key ? "is-active" : ""}`}
+              onClick={() => onModeChange(m.key)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      <div>
-        <h4>User</h4>
+      <div className="navbar__actions">
+        <button className="navbar__btn" onClick={() => navigate("/create")}>Create Room</button>
+        <button className="navbar__btn" onClick={() => navigate("/join")}>Join Room</button>
+        {roomId && (
+          <button className={`navbar__btn navbar__btn--accent ${copied ? "is-copied" : ""}`} onClick={handleShare}>
+            {copied ? "Copied!" : "Share"}
+          </button>
+        )}
       </div>
     </div>
   );
