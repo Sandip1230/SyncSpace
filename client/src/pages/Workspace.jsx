@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import WorkspaceSidebar from "../components/WorkspaceSidebar";
 import Toolbar from "../components/Toolbar";
 import Whiteboard from "../components/Whiteboard";
 import CodeEditor from "../components/CodeEditor";
@@ -18,8 +18,8 @@ function Workspace() {
   const [username] = useState(getStoredUsername() || randomGuestName());
 
   const { connecting, users, error } = useSocket(roomId, username);
-  const { ydoc, fileTreeMap, yshapes, undoManager, awareness } = useYDoc(roomId, username);
-  const fileSystem = useFileSystem(ydoc, fileTreeMap);
+  const { ydoc, fileTreeMap, yshapes, undoManager, awareness, synced } = useYDoc(roomId, username);
+  const fileSystem = useFileSystem(ydoc, fileTreeMap, synced);
 
   const [mode, setMode] = useState("split");
   const [tool, setTool] = useState("pen");
@@ -41,7 +41,7 @@ function Workspace() {
         </div>
       ) : (
         <div className={`workspace-stage stage--${mode}`}>
-          <Sidebar roomId={roomId} users={users} connected={!connecting} />
+          <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
 
           <div className="workspace-panel workspace-panel--editor">
             <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />

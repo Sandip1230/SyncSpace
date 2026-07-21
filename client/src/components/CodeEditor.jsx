@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { MonacoBinding } from "y-monaco";
-import FileExplorer, { FileIcon } from "./FileExplorer";
+import { FileIcon } from "./FileExplorer";
 import Terminal from "./Terminal";
 import { isRunnable } from "../lib/fileTree";
 import "./CodeEditor.css";
@@ -12,7 +12,6 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
   const monacoRef = useRef(null);
   const bindingRef = useRef(null);
 
-  const [explorerOpen, setExplorerOpen] = useState(true);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [runRequest, setRunRequest] = useState(null);
 
@@ -48,36 +47,36 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
 
   return (
     <div className="code-editor">
-      {explorerOpen && <FileExplorer fileSystem={fileSystem} onCollapse={() => setExplorerOpen(false)} />}
-
-      <div className="code-editor__main">
-        <div className="code-editor__tabbar">
-          <div className="code-editor__file-label">
-            {!explorerOpen && <button className="fx-icon-btn" onClick={() => setExplorerOpen(true)} title="Show explorer">▶</button>}
-            {activeFile && <FileIcon name={activeFile.name} size={14} />}
-            <span>{activeFile ? activeFile.name : "No file open"}</span>
-          </div>
-          <div className="code-editor__tools">
-            <button className="btn-run" onClick={handleRun} disabled={!runnable} title={runnable ? "Run in-browser" : "JS/TS only"}>▶ Run</button>
-            <button className={`btn-terminal ${terminalOpen ? "is-active" : ""}`} onClick={() => setTerminalOpen((v) => !v)}>Terminal</button>
-          </div>
+      <div className="code-editor__tabbar">
+        <div className="code-editor__file-label">
+          {activeFile && <FileIcon name={activeFile.name} size={14} />}
+          <span>{activeFile ? activeFile.name : "No file open — select one from the explorer"}</span>
         </div>
+        <div className="code-editor__tools">
+          <button className="btn-run" onClick={handleRun} disabled={!runnable} title={runnable ? "Run in-browser" : "JS/TS only"}>▶ Run</button>
+          <button className={`btn-terminal ${terminalOpen ? "is-active" : ""}`} onClick={() => setTerminalOpen((v) => !v)}>Terminal</button>
+        </div>
+      </div>
 
-        <div className="code-editor__surface">
+      <div className="code-editor__surface">
+        {activeText ? (
           <Editor
+            key={activeFileId}
             language={language}
             theme="vs-dark"
             onMount={handleMount}
             options={{ automaticLayout: true, fontSize: 14, minimap: { enabled: false }, smoothScrolling: true, padding: { top: 12 } }}
           />
-        </div>
-
-        {terminalOpen && (
-          <div className="code-editor__terminal">
-            <Terminal code={runRequest?.code ?? ""} language={runRequest?.language ?? language} autoRunToken={runRequest?.token} onClose={() => setTerminalOpen(false)} />
-          </div>
+        ) : (
+          <div className="code-editor__empty">Select a file from the explorer to start editing.</div>
         )}
       </div>
+
+      {terminalOpen && (
+        <div className="code-editor__terminal">
+          <Terminal code={runRequest?.code ?? ""} language={runRequest?.language ?? language} autoRunToken={runRequest?.token} onClose={() => setTerminalOpen(false)} />
+        </div>
+      )}
     </div>
   );
 }

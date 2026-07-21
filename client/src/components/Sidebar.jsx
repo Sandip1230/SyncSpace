@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./Sidebar.css";
 
 function stringToColor(str) {
@@ -7,14 +8,27 @@ function stringToColor(str) {
 }
 
 function Sidebar({ roomId, users = [], connected }) {
-  const copyRoomId = () => navigator.clipboard?.writeText(roomId);
+  const [copied, setCopied] = useState(false);
+
+  const copyRoomId = () => {
+    navigator.clipboard?.writeText(roomId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="sidebar">
       <div className="sidebar__section-label">Room</div>
       <div className="sidebar__room-row">
         <code className="sidebar__room-id">{roomId}</code>
-        <button className="sidebar__copy-btn" onClick={copyRoomId} title="Copy room ID">Copy</button>
+        <button className={`sidebar__copy-btn ${copied ? "is-copied" : ""}`} onClick={copyRoomId} title="Copy room ID">
+          {copied ? (
+            <>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              Copied
+            </>
+          ) : "Copy"}
+        </button>
       </div>
       <div className="sidebar__status">
         <span className={`sidebar__status-dot ${connected ? "is-live" : "is-offline"}`} />

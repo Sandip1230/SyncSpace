@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as Y from "yjs";
 import * as awarenessProtocol from "y-protocols/awareness.js";
 import socket from "../services/socket";
@@ -17,19 +17,25 @@ export function useYDoc(roomId, username) {
   const yshapes = useMemo(() => ydoc.getArray("shapes"), [ydoc]);
   const undoManager = useMemo(() => createUndoManager(yshapes), [yshapes]);
   const awareness = useMemo(() => new awarenessProtocol.Awareness(ydoc), [ydoc]);
+  const [synced, setSynced] = useState(false);
 
   useEffect(() => {
     if (!roomId) return undefined;
+    setSynced(false);
 
-    const onSync = (state) => Y.applyUpdate(ydoc, new Uint8Array(state), "remote");
+    const onSync = (state) => {
+      Y.applyUpdate(ydoc, new Uint8Array(state), "remote");
+      // Only now do we actually know whether this room already has files —
+      // seeding a "default" file before this point is what caused two
+      // clients joining together to each create their own main.js.
+      setSynced(true);
+    };
     const onUpdate = (update) => Y.applyUpdate(ydoc, new Uint8Array(update), "remote");
     const onLocalUpdate = (update, origin) => {
       if (origin === "remote") return;
       socket.emit(SOCKET_EVENTS.YJS_UPDATE, { roomId, update });
     };
 
-    // Remote collaborators' cursor/selection state comes in over the same
-    // socket relay the backend already had — this was the missing wire-up.
     const onAwarenessUpdate = (update) => {
       awarenessProtocol.applyAwarenessUpdate(awareness, new Uint8Array(update), "remote");
     };
@@ -61,5 +67,5 @@ export function useYDoc(roomId, username) {
     };
   }, [ydoc, roomId, undoManager, awareness, username]);
 
-  return { ydoc, fileTreeMap, yshapes, undoManager, awareness };
+  return { ydoc, fileTreeMap, yshapes, undoManager, awareness, synced };
 }

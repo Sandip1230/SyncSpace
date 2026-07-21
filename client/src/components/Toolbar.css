@@ -25,9 +25,40 @@
   width: 22px; height: 22px; border-radius: 50%;
   border: 2px solid transparent; cursor: pointer; padding: 0;
 }
-.wb-swatch.is-active { border-color: #e7edf7; }
-.wb-swatch--custom { overflow: hidden; border: 1px dashed #6f80a3; }
-.wb-swatch--custom input { width: 28px; height: 28px; margin: -3px; cursor: pointer; }
+.wb-custom-color {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #111827;
+  border: 1px solid #2c3f66;
+  border-radius: 6px;
+  padding: 3px 6px 3px 3px;
+}
+.wb-custom-color__swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid #3fc6d6;
+  overflow: hidden;
+  cursor: pointer;
+  display: block;
+  flex-shrink: 0;
+}
+.wb-custom-color__swatch input {
+  width: 30px; height: 30px;
+  margin: -4px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.wb-custom-color__hex {
+  width: 62px;
+  background: transparent;
+  border: none;
+  color: #e7edf7;
+  font-size: 11px;
+  font-family: monospace;
+  outline: none;
+}
 .wb-width {
   width: 28px; height: 28px;
   display: inline-flex; align-items: center; justify-content: center;

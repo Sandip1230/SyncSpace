@@ -1,13 +1,10 @@
 .file-explorer {
-  width: 230px;
-  min-width: 230px;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--bg-panel);
-  border-right: 1px solid var(--border-subtle);
   user-select: none;
-  animation: fade-in var(--duration-med) var(--ease);
 }
 
 .fx-toolbar {

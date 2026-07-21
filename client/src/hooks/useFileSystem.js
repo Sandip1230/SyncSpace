@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { buildTree, createFile, createFolder, deleteEntry, getFileText, moveEntry, renameEntry, seedDefaultTree, ROOT_ID } from "../lib/fileTree";
 
-export function useFileSystem(ydoc, fileTreeMap) {
+export function useFileSystem(ydoc, fileTreeMap, synced) {
   const [entries, setEntries] = useState([]);
   const [activeFileId, setActiveFileId] = useState(null);
+  const hasSeededRef = useRef(false);
 
   useEffect(() => {
     const sync = () => setEntries(Array.from(fileTreeMap.values()));
@@ -13,12 +14,13 @@ export function useFileSystem(ydoc, fileTreeMap) {
   }, [fileTreeMap]);
 
   useEffect(() => {
+    if (!synced || hasSeededRef.current) return;
+    hasSeededRef.current = true;
     if (fileTreeMap.size === 0) {
       const id = seedDefaultTree(ydoc, fileTreeMap);
       if (id) setActiveFileId(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [synced, ydoc, fileTreeMap]);
 
   useEffect(() => {
     if (activeFileId && entries.some((e) => e.id === activeFileId && e.type === "file")) return;

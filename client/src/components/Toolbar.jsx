@@ -146,14 +146,19 @@ export default function Toolbar({
             onClick={() => onColorChange(c)}
           />
         ))}
-        <label className="wb-swatch wb-swatch--custom" title="Custom color">
+        <div className="wb-custom-color">
+          <label className="wb-custom-color__swatch" style={{ background: color }} title="Pick custom color">
+            <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} aria-label="Custom color picker" />
+          </label>
           <input
-            type="color"
+            className="wb-custom-color__hex"
             value={color}
             onChange={(e) => onColorChange(e.target.value)}
-            aria-label="Custom color"
+            spellCheck={false}
+            maxLength={7}
+            aria-label="Custom color hex value"
           />
-        </label>
+        </div>
       </div>
 
       <div className="wb-toolbar__divider" />
