@@ -35,3 +35,21 @@ export async function signupRequest(username, email, password) {
   });
   return handle(res);
 }
+
+export async function forgotPasswordRequest(email) {
+  const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  return handle(res);
+}
+
+export async function resetPasswordRequest(email, otp, newPassword) {
+  const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, otp, newPassword }),
+  });
+  return handle(res);
+}

@@ -7,9 +7,13 @@ const { sendOtpEmail } = require("../utils/mailer");
 
 const router = express.Router();
 
+const OTP_TTL_MS = 10 * 60 * 1000;
+const RESEND_COOLDOWN_MS = 60 * 1000;
+
 function generateOtp() {
   return crypto.randomInt(100000, 999999).toString();
 }
+
 router.post("/login", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -32,6 +36,7 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: "Server error during login" });
   }
 });
+
 router.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -46,7 +51,7 @@ router.post("/signup", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = generateOtp();
-    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
 
     const user = await User.create({
       username, email, password: hashedPassword,
@@ -94,7 +99,7 @@ router.post("/resend-otp", async (req, res) => {
 
     const otp = generateOtp();
     user.otp = otp;
-    user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
     await user.save();
 
     await sendOtpEmail(email, otp);
@@ -105,33 +110,21 @@ router.post("/resend-otp", async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
-    if (!user.isVerified) return res.status(403).json({ error: "Please verify your email first" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.json({ token, username: user.username });
-  } catch (err) {
-    console.error("Login error:", err.message);
-    res.status(500).json({ error: "Server error during login" });
-  }
-});
-
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: "No account with that email" });
 
+    // A fresh OTP issued < (TTL - cooldown) ago means one was just sent —
+    // block re-sends within the cooldown window without needing a new field.
+    if (user.otpExpiresAt && user.otpExpiresAt.getTime() - Date.now() > OTP_TTL_MS - RESEND_COOLDOWN_MS) {
+      return res.status(429).json({ error: "A code was just sent — please wait a minute before retrying." });
+    }
+
     const otp = generateOtp();
     user.otp = otp;
-    user.otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
     await user.save();
 
     await sendOtpEmail(email, otp);
@@ -162,6 +155,5 @@ router.post("/reset-password", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 module.exports = router;
