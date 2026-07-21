@@ -1,0 +1,22 @@
+.workspace-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-panel);
+}
+
+.workspace-sidebar__pane {
+  overflow-y: auto;
+}
+
+.workspace-sidebar__pane--room {
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 12px;
+}
+
+.workspace-sidebar__pane--explorer {
+  flex: 1 1 auto;
+  padding: 12px;
+}
