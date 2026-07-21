@@ -35,7 +35,6 @@ export async function signupRequest(username, email, password) {
   });
   return handle(res);
 }
-
 export async function verifyOtpRequest(email, otp) {
   const res = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
     method: "POST",
