@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import WorkspaceSidebar from "../components/WorkspaceSidebar";
@@ -26,6 +26,21 @@ function Workspace() {
   const [color, setColor] = useState("#3fc6d6");
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [dismissedError, setDismissedError] = useState(false);
+  const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
+
+  useEffect(() => {
+    if (!undoManager) return undefined;
+    const refresh = () => setUndoState({ canUndo: undoManager.canUndo(), canRedo: undoManager.canRedo() });
+    refresh();
+    undoManager.on("stack-item-added", refresh);
+    undoManager.on("stack-item-popped", refresh);
+    undoManager.on("stack-cleared", refresh);
+    return () => {
+      undoManager.off("stack-item-added", refresh);
+      undoManager.off("stack-item-popped", refresh);
+      undoManager.off("stack-cleared", refresh);
+    };
+  }, [undoManager]);
 
   return (
     <>
@@ -48,7 +63,20 @@ function Workspace() {
           </div>
 
           <div className="workspace-panel workspace-panel--whiteboard">
-            <Toolbar tool={tool} onToolChange={setTool} color={color} onColorChange={setColor} strokeWidth={strokeWidth} onStrokeWidthChange={setStrokeWidth} onUndo={() => undoManager.undo()} onRedo={() => undoManager.redo()} onClear={() => clearShapes(yshapes)} onClose={() => setMode("editor")} />
+            <Toolbar
+              tool={tool}
+              onToolChange={setTool}
+              color={color}
+              onColorChange={setColor}
+              strokeWidth={strokeWidth}
+              onStrokeWidthChange={setStrokeWidth}
+              onUndo={() => undoManager.undo()}
+              onRedo={() => undoManager.redo()}
+              canUndo={undoState.canUndo}
+              canRedo={undoState.canRedo}
+              onClear={() => clearShapes(yshapes)}
+              onClose={() => setMode("editor")}
+            />
             <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
           </div>
         </div>

@@ -33,5 +33,5 @@ export function clearShapes(shapesArray) {
 }
 
 export function createUndoManager(shapesArray) {
-  return new Y.UndoManager(shapesArray);
+  return new Y.UndoManager(shapesArray, { captureTimeout: 300 });
 }

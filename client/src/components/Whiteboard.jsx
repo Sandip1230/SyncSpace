@@ -18,9 +18,6 @@ function Whiteboard({ yshapes, tool, color, strokeWidth }) {
   const [selectedId, setSelectedId] = useState(null);
   const [editingText, setEditingText] = useState(null); // { x, y, value }
 
-  // Stage now tracks the actual space it's given instead of a one-time
-  // window.innerWidth snapshot, so it stays correct as Sidebar/CodeEditor
-  // widths change and on window resize.
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return undefined;
@@ -132,8 +129,6 @@ function Whiteboard({ yshapes, tool, color, strokeWidth }) {
                 y: e.target.y() - s.height / 2,
               });
             } else {
-              // line / arrow: geometry (points) stays put, only the
-              // translation offset moves.
               updateShapeById(yshapes, s.id, { offsetX: e.target.x(), offsetY: e.target.y() });
             }
           },
@@ -175,7 +170,6 @@ function Whiteboard({ yshapes, tool, color, strokeWidth }) {
                 <Text key={s.id} x={s.x} y={s.y} text={s.text} fontSize={s.fontSize} fill={stroke} {...selectableProps(s)} />
               );
             }
-            // pen / eraser
             return (
               <Line
                 key={s.id}
