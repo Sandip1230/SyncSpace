@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
+import ThemeToggle from "./ThemeToggle";
 import "./Navbar.css";
 
 const MODES = [
@@ -40,6 +41,7 @@ function Navbar({ roomId, mode, onModeChange }) {
       )}
 
       <div className="navbar__actions">
+        <ThemeToggle />
         <button className="navbar__btn" onClick={() => navigate("/create")}>Create Room</button>
         <button className="navbar__btn" onClick={() => navigate("/join")}>Join Room</button>
         {roomId && (

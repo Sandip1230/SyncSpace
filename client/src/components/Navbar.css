@@ -149,3 +149,9 @@
 }
 .wb-tool:active, .wb-swatch:active, .wb-width:active { transform: scale(0.92); }
 .wb-tool.is-active { animation: fade-in var(--duration-fast) var(--ease); }
+.navbar__btn--icon {
+  padding: 8px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
