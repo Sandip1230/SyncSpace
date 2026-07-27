@@ -1,0 +1,130 @@
+.settings {
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.settings-card {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(31, 41, 55, 0.95);
+  border: 1px solid #314766;
+  border-radius: 16px;
+  padding: 28px;
+  color: #f8fafc;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+}
+
+.settings-header {
+  margin-bottom: 20px;
+}
+
+.settings-eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: #7dd3fc;
+}
+
+.settings-card h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+}
+
+.settings-description {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.settings-group input[type="text"] {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #3a4f7a;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.settings-group input[type="text"]:focus {
+  border-color: #38bdf8;
+}
+
+.toggle-group {
+  padding: 10px 0;
+}
+
+.toggle-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.8);
+  cursor: pointer;
+}
+
+.toggle-item input[type="checkbox"] {
+  margin-top: 2px;
+  accent-color: #38bdf8;
+}
+
+.toggle-item span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toggle-item small {
+  color: #94a3b8;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+  color: #f8fafc;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+}
+
+.save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(59, 130, 246, 0.3);
+}
+
+.save-message {
+  margin: 0;
+  text-align: center;
+  color: #86efac;
+  font-weight: 600;
+}

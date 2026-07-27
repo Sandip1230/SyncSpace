@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import VerifyOtp from "./pages/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/workspace/:roomId" element={<Workspace />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/settings" element={<Settings />} />
     </Routes>
   );
 }

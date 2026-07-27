@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FiSettings } from "react-icons/fi";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import "./Navbar.css";
@@ -20,7 +21,10 @@ function Navbar({ roomId, mode, onModeChange }) {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const activeIndex = Math.max(0, MODES.findIndex((m) => m.key === mode));
+  const activeIndex = Math.max(
+    0,
+    MODES.findIndex((m) => m.key === mode)
+  );
 
   return (
     <div className="navbar">
@@ -30,10 +34,23 @@ function Navbar({ roomId, mode, onModeChange }) {
       </Link>
 
       {roomId && onModeChange && (
-        <div className="mode-toggle" style={{ "--mode-count": MODES.length, "--mode-index": activeIndex }}>
+        <div
+          className="mode-toggle"
+          style={{
+            "--mode-count": MODES.length,
+            "--mode-index": activeIndex,
+          }}
+        >
           <span className="mode-toggle__indicator" />
+
           {MODES.map((m) => (
-            <button key={m.key} className={`mode-toggle__btn ${mode === m.key ? "is-active" : ""}`} onClick={() => onModeChange(m.key)}>
+            <button
+              key={m.key}
+              className={`mode-toggle__btn ${
+                mode === m.key ? "is-active" : ""
+              }`}
+              onClick={() => onModeChange(m.key)}
+            >
               {m.label}
             </button>
           ))}
@@ -42,10 +59,36 @@ function Navbar({ roomId, mode, onModeChange }) {
 
       <div className="navbar__actions">
         <ThemeToggle />
-        <button className="navbar__btn" onClick={() => navigate("/create")}>Create Room</button>
-        <button className="navbar__btn" onClick={() => navigate("/join")}>Join Room</button>
+
+        <button
+          className="navbar__btn navbar__btn--icon"
+          onClick={() => navigate("/settings")}
+        >
+          <FiSettings />
+          <span>Settings</span>
+        </button>
+
+        <button
+          className="navbar__btn"
+          onClick={() => navigate("/create")}
+        >
+          Create Room
+        </button>
+
+        <button
+          className="navbar__btn"
+          onClick={() => navigate("/join")}
+        >
+          Join Room
+        </button>
+
         {roomId && (
-          <button className={`navbar__btn navbar__btn--accent ${copied ? "is-copied" : ""}`} onClick={handleShare}>
+          <button
+            className={`navbar__btn navbar__btn--accent ${
+              copied ? "is-copied" : ""
+            }`}
+            onClick={handleShare}
+          >
             {copied ? "Copied!" : "Share"}
           </button>
         )}
