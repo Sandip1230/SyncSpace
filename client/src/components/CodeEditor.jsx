@@ -6,11 +6,11 @@ import Terminal from "./Terminal";
 import { isRunnable } from "../lib/fileTree";
 import "./CodeEditor.css";
 
-function CodeEditor({ ydoc, fileSystem, awareness }) {
+function CodeEditor({fileSystem, awareness }) {
   const { activeFile, activeFileId, activeText } = fileSystem;
-  const editorRef = useRef(null);
-  const monacoRef = useRef(null);
   const bindingRef = useRef(null);
+  const [editorInstance, setEditorInstance] = useState(null);
+  const [monacoInstance, setMonacoInstance] = useState(null);
 
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [runRequest, setRunRequest] = useState(null);
@@ -19,23 +19,21 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
   const runnable = isRunnable(language);
 
   const handleMount = (editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
+    setEditorInstance(editor);
+    setMonacoInstance(monaco);
   };
 
   useEffect(() => {
-    const editor = editorRef.current;
-    const monaco = monacoRef.current;
-    if (!editor || !monaco || !activeText || !awareness) return undefined;
+    if (!editorInstance || !monacoInstance || !activeText || !awareness) return undefined;
 
     bindingRef.current?.destroy();
-    const model = editor.getModel();
-    monaco.editor.setModelLanguage(model, language);
-    bindingRef.current = new MonacoBinding(activeText, model, new Set([editor]), awareness);
+    const model = editorInstance.getModel();
+    monacoInstance.editor.setModelLanguage(model, language);
+    bindingRef.current = new MonacoBinding(activeText, model, new Set([editorInstance]), awareness);
 
     return () => bindingRef.current?.destroy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFileId, activeText, awareness]);
+  }, [editorInstance, monacoInstance, activeFileId, activeText, awareness]);
 
   useEffect(() => () => bindingRef.current?.destroy(), []);
 
