@@ -19,7 +19,7 @@ async function getOrCreateRoom(roomId) {
   }
 
   const doc = new Y.Doc();
-  room = { doc, users: new Map(), dirty: false };
+  room = { doc, users: new Map(), dirty: false, adminSocketId: null };
   rooms.set(roomId, room);
 
   const loadPromise = (async () => {
@@ -78,7 +78,11 @@ function scheduleEvictionIfEmpty(roomId) {
 function listUsers(roomId) {
   const room = rooms.get(roomId);
   if (!room) return [];
-  return Array.from(room.users.entries()).map(([socketId, info]) => ({ socketId, ...info }));
+  return Array.from(room.users.entries()).map(([socketId, info]) => ({
+    socketId,
+    ...info,
+    isAdmin: socketId === room.adminSocketId,
+  }));
 }
 
 module.exports = { rooms, getOrCreateRoom, getRoom, roomExists, scheduleEvictionIfEmpty, listUsers };

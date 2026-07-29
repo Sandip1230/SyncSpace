@@ -39,11 +39,12 @@ function Sidebar({ roomId, users = [], connected }) {
       {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
       <div className="sidebar__users">
         {users.map((u) => (
-          <div key={u.socketId} className="sidebar__user fade-in">
+          <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
             <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
               {(u.username || "?").slice(0, 1).toUpperCase()}
             </span>
             <span className="sidebar__username">{u.username}</span>
+            {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
           </div>
         ))}
       </div>
