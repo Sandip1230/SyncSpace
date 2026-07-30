@@ -18,6 +18,32 @@
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
 }
 
+/* NEW - Back Button */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  margin-bottom: 20px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.back-btn:active {
+  transform: scale(0.98);
+}
+
 .settings-header {
   margin-bottom: 20px;
 }
@@ -127,4 +153,41 @@
   text-align: center;
   color: #86efac;
   font-weight: 600;
+}
+/* New Settings Controls */
+
+.settings-group select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #3a4f7a;
+  border-radius: 8px;
+  background: #111827;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.settings-group select:focus {
+  border-color: #38bdf8;
+}
+
+.settings-group input[type="range"] {
+  width: 100%;
+  margin-top: 8px;
+  accent-color: #38bdf8;
+}
+
+.settings-group small {
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.settings-form h2 {
+  margin-top: 22px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #334155;
+  color: #7dd3fc;
+  font-size: 1.05rem;
 }
