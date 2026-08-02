@@ -12,6 +12,7 @@ const { rooms } = require("./sockets/roomStore");
 const { flushAll, stopAutosave } = require("./sockets/persistence");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 const authRouter = require("./routes/auth");
+const pingHandler = require("./sockets/pingHandler");
 
 const PORT = process.env.PORT || 5000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "*";
@@ -33,6 +34,7 @@ const io = new Server(server, { cors: { origin: FRONTEND_ORIGIN }, maxHttpBuffer
 io.on("connection", (socket) => {
   roomHandler(io, socket);
   yjsHandler(io, socket);
+  pingHandler(io, socket);
 });
 
 connectDB().then(() => {

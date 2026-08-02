@@ -4,6 +4,7 @@ import { FiSettings } from "react-icons/fi";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import "./Navbar.css";
+import PingIndicator from "./PingIndicator";
 
 const MODES = [
   { key: "editor", label: "Editor" },
@@ -58,6 +59,7 @@ function Navbar({ roomId, mode, onModeChange }) {
       )}
 
       <div className="navbar__actions">
+        <PingIndicator />
         <ThemeToggle />
 
         <button
