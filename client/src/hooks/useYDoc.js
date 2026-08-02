@@ -15,6 +15,7 @@ export function useYDoc(roomId, username) {
   const ydoc = useMemo(() => new Y.Doc(), [roomId]);
   const fileTreeMap = useMemo(() => ydoc.getMap("fileTree"), [ydoc]);
   const yshapes = useMemo(() => ydoc.getArray("shapes"), [ydoc]);
+  const ychat = useMemo(() => ydoc.getArray("chat"), [ydoc]);
   const undoManager = useMemo(() => createUndoManager(yshapes), [yshapes]);
   const awareness = useMemo(() => new awarenessProtocol.Awareness(ydoc), [ydoc]);
   const [synced, setSynced] = useState(false);
@@ -67,5 +68,5 @@ export function useYDoc(roomId, username) {
     };
   }, [ydoc, roomId, undoManager, awareness, username]);
 
-  return { ydoc, fileTreeMap, yshapes, undoManager, awareness, synced };
+  return { ydoc, fileTreeMap, yshapes, ychat, undoManager, awareness, synced };
 }

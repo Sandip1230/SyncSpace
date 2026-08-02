@@ -6,6 +6,7 @@ import Toolbar from "../components/Toolbar";
 import Whiteboard from "../components/Whiteboard";
 import CodeEditor from "../components/CodeEditor";
 import Toast from "../components/Toast";
+import ChatPanel from "../components/ChatPanel";
 import { useSocket } from "../hooks/useSocket";
 import { useYDoc } from "../hooks/useYDoc";
 import { useFileSystem } from "../hooks/useFileSystem";
@@ -18,7 +19,7 @@ function Workspace() {
   const [username] = useState(getStoredUsername() || randomGuestName());
 
   const { connecting, users, error } = useSocket(roomId, username);
-  const { ydoc, fileTreeMap, yshapes, undoManager, awareness, synced } = useYDoc(roomId, username);
+  const { ydoc, fileTreeMap, yshapes, ychat, undoManager, awareness, synced } = useYDoc(roomId, username);
   const fileSystem = useFileSystem(ydoc, fileTreeMap, synced);
 
   const [mode, setMode] = useState("split");
@@ -83,6 +84,8 @@ function Workspace() {
       )}
 
       {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}
+
+      <ChatPanel ychat={ychat} username={username} />
     </>
   );
 }
