@@ -12,13 +12,24 @@ const MODES = [
   { key: "whiteboard", label: "Whiteboard" },
 ];
 
-// 1. Added onOpenReplay to the destructured props
 function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
   const navigate = useNavigate();
+
   const [copied, setCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+
+  const meetingLink = window.location.href;
 
   const handleShare = () => {
-    navigator.clipboard?.writeText(window.location.href);
+    setShowShareModal(true);
+  };
+
+  const copyMeetingId = () => {
+    navigator.clipboard.writeText(roomId);
+  };
+
+  const copyMeetingLink = () => {
+    navigator.clipboard.writeText(meetingLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
@@ -29,81 +40,116 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
   );
 
   return (
-    <div className="navbar">
-      <Link to="/" className="navbar__brand">
-        <Logo />
-        <h2>SyncSpace</h2>
-      </Link>
+    <>
+      <div className="navbar">
+        <Link to="/" className="navbar__brand">
+          <Logo />
+          <h2>SyncSpace</h2>
+        </Link>
 
-      {roomId && onModeChange && (
-        <div
-          className="mode-toggle"
-          style={{
-            "--mode-count": MODES.length,
-            "--mode-index": activeIndex,
-          }}
-        >
-          <span className="mode-toggle__indicator" />
+        {roomId && onModeChange && (
+          <div
+            className="mode-toggle"
+            style={{
+              "--mode-count": MODES.length,
+              "--mode-index": activeIndex,
+            }}
+          >
+            <span className="mode-toggle__indicator" />
 
-          {MODES.map((m) => (
+            {MODES.map((m) => (
+              <button
+                key={m.key}
+                className={`mode-toggle__btn ${
+                  mode === m.key ? "is-active" : ""
+                }`}
+                onClick={() => onModeChange(m.key)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="navbar__actions">
+          <PingIndicator />
+          <ThemeToggle />
+
+          <button
+            className="navbar__btn navbar__btn--icon"
+            onClick={() => navigate("/settings")}
+          >
+            <FiSettings />
+            <span>Settings</span>
+          </button>
+
+          <button
+            className="navbar__btn"
+            onClick={() => navigate("/create")}
+          >
+            Create Room
+          </button>
+
+          <button
+            className="navbar__btn"
+            onClick={() => navigate("/join")}
+          >
+            Join Room
+          </button>
+
+          {roomId && onOpenReplay && (
             <button
-              key={m.key}
-              className={`mode-toggle__btn ${
-                mode === m.key ? "is-active" : ""
-              }`}
-              onClick={() => onModeChange(m.key)}
+              className="navbar__btn"
+              onClick={onOpenReplay}
             >
-              {m.label}
+              Replay
             </button>
-          ))}
+          )}
+
+          {roomId && (
+            <button
+              className="navbar__btn navbar__btn--accent"
+              onClick={handleShare}
+            >
+              Share
+            </button>
+          )}
+        </div>
+      </div>
+
+      {showShareModal && (
+        <div className="share-modal-overlay">
+          <div className="share-modal">
+            <h2>Share Meeting</h2>
+
+            <label>Meeting ID</label>
+
+            <div className="share-field">
+              <input value={roomId} readOnly />
+              <button onClick={copyMeetingId}>
+                Copy
+              </button>
+            </div>
+
+            <label>Meeting Link</label>
+
+            <div className="share-field">
+              <input value={meetingLink} readOnly />
+              <button onClick={copyMeetingLink}>
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+
+            <button
+              className="close-btn"
+              onClick={() => setShowShareModal(false)}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
-
-      <div className="navbar__actions">
-        <PingIndicator />
-        <ThemeToggle />
-
-        <button
-          className="navbar__btn navbar__btn--icon"
-          onClick={() => navigate("/settings")}
-        >
-          <FiSettings />
-          <span>Settings</span>
-        </button>
-
-        <button
-          className="navbar__btn"
-          onClick={() => navigate("/create")}
-        >
-          Create Room
-        </button>
-
-        <button
-          className="navbar__btn"
-          onClick={() => navigate("/join")}
-        >
-          Join Room
-        </button>
-
-        {/* 2. Added the Replay button here: */}
-        {roomId && onOpenReplay && (
-          <button className="navbar__btn" onClick={onOpenReplay}>
-            Replay
-          </button>
-        )}
-
-        {roomId && (
-          <button
-            className={`navbar__btn navbar__btn--accent ${
-              copied ? "is-copied" : ""
-            }`}
-            onClick={handleShare}
-          >
-            {copied ? "Copied!" : "Share"}
-          </button>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 
