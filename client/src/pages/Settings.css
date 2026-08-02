@@ -191,3 +191,36 @@
   color: #7dd3fc;
   font-size: 1.05rem;
 }
+/* Buttons Row */
+.settings-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Save Button */
+.save-btn {
+  flex: 1;
+}
+
+/* Reset Button */
+.reset-btn {
+  flex: 1;
+  padding: 12px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.reset-btn:active {
+  transform: scale(0.98);
+}

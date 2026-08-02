@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Settings.css";
 
@@ -20,8 +20,48 @@ export default function Settings() {
 
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("syncspace-settings");
+
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+
+      setUsername(settings.username ?? "Guest");
+      setNotifications(settings.notifications ?? true);
+      setAutosave(settings.autosave ?? true);
+      setTheme(settings.theme ?? "Light");
+      setFontSize(settings.fontSize ?? 16);
+      setFontFamily(settings.fontFamily ?? "Monospace");
+      setWordWrap(settings.wordWrap ?? true);
+      setLineNumbers(settings.lineNumbers ?? true);
+      setMiniMap(settings.miniMap ?? true);
+      setShowOnlineUsers(settings.showOnlineUsers ?? true);
+      setShowGrid(settings.showGrid ?? true);
+    }
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const settings = {
+      username,
+      notifications,
+      autosave,
+      theme,
+      fontSize,
+      fontFamily,
+      wordWrap,
+      lineNumbers,
+      miniMap,
+      showOnlineUsers,
+      showGrid,
+    };
+
+    localStorage.setItem(
+      "syncspace-settings",
+      JSON.stringify(settings)
+    );
+
     setSaved(true);
   };
 
@@ -31,6 +71,7 @@ export default function Settings() {
 
         <button
           className="back-btn"
+          type="button"
           onClick={() => navigate(-1)}
         >
           ← Back to Editor
@@ -40,14 +81,11 @@ export default function Settings() {
           <p className="settings-eyebrow">Preferences</p>
           <h1>⚙️ Settings</h1>
           <p className="settings-description">
-            Customize your workspace experience and keep everything running
-            smoothly.
+            Customize your workspace experience and keep everything running smoothly.
           </p>
         </div>
 
         <form className="settings-form" onSubmit={handleSubmit}>
-
-          {/* General */}
 
           <div className="settings-group">
             <label>Username</label>
@@ -93,9 +131,6 @@ export default function Settings() {
               <option>Consolas</option>
             </select>
           </div>
-
-          {/* Collaboration */}
-
           <div className="settings-group toggle-group">
             <label className="toggle-item">
               <input
@@ -115,9 +150,7 @@ export default function Settings() {
               <input
                 type="checkbox"
                 checked={showOnlineUsers}
-                onChange={() =>
-                  setShowOnlineUsers(!showOnlineUsers)
-                }
+                onChange={() => setShowOnlineUsers(!showOnlineUsers)}
               />
               <span>
                 <strong>Show Online Users</strong>
@@ -125,8 +158,6 @@ export default function Settings() {
               </span>
             </label>
           </div>
-
-          {/* Editor */}
 
           <div className="settings-group toggle-group">
             <label className="toggle-item">
@@ -137,6 +168,7 @@ export default function Settings() {
               />
               <span>
                 <strong>Enable Auto Save</strong>
+                <small>Automatically save your work.</small>
               </span>
             </label>
           </div>
@@ -150,6 +182,7 @@ export default function Settings() {
               />
               <span>
                 <strong>Word Wrap</strong>
+                <small>Wrap long lines in the editor.</small>
               </span>
             </label>
           </div>
@@ -159,12 +192,11 @@ export default function Settings() {
               <input
                 type="checkbox"
                 checked={lineNumbers}
-                onChange={() =>
-                  setLineNumbers(!lineNumbers)
-                }
+                onChange={() => setLineNumbers(!lineNumbers)}
               />
               <span>
                 <strong>Show Line Numbers</strong>
+                <small>Display editor line numbers.</small>
               </span>
             </label>
           </div>
@@ -178,11 +210,10 @@ export default function Settings() {
               />
               <span>
                 <strong>Show Mini Map</strong>
+                <small>Display Monaco editor minimap.</small>
               </span>
             </label>
           </div>
-
-          {/* Whiteboard */}
 
           <div className="settings-group toggle-group">
             <label className="toggle-item">
@@ -193,17 +224,31 @@ export default function Settings() {
               />
               <span>
                 <strong>Show Whiteboard Grid</strong>
+                <small>Display grid on the whiteboard.</small>
               </span>
             </label>
           </div>
 
-          <button className="save-btn" type="submit">
-            Save Settings
-          </button>
+          <div className="settings-actions">
+            <button className="save-btn" type="submit">
+              Save Settings
+            </button>
+
+            <button
+              type="button"
+              className="reset-btn"
+              onClick={() => {
+                localStorage.removeItem("syncspace-settings");
+                window.location.reload();
+              }}
+            >
+              Reset Settings
+            </button>
+          </div>
 
           {saved && (
             <p className="save-message">
-              Settings saved successfully!
+              ✅ Settings saved successfully!
             </p>
           )}
         </form>
