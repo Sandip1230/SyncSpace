@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import "./Toolbar.css";
 
 const TOOLS = [
@@ -10,7 +11,16 @@ const TOOLS = [
   { id: "eraser", label: "Eraser", icon: "eraser" },
 ];
 
-const COLORS = ["#e7edf7", "#3fc6d6", "#3ddc97", "#f2b134", "#ff6b6b", "#c77dff"];
+const QUICK_COLORS = ["#e7edf7", "#3fc6d6", "#3ddc97", "#f2b134", "#ff6b6b", "#c77dff"];
+
+const PALETTE = [
+  "#ffffff", "#e7edf7", "#a9b8d4", "#5b6478", "#131a2a", "#000000",
+  "#3fc6d6", "#56d3e1", "#2596a1", "#1d7d87", "#0e4f57", "#093338",
+  "#3ddc97", "#1b9e6b", "#7be495", "#c1f7dd", "#f2b134", "#ffcf5c",
+  "#ff9f1c", "#c77dff", "#9d4edd", "#e0aaff", "#ff6b6b", "#d33f3f",
+  "#ff8fab", "#fb6f92", "#7209b7", "#3a0ca3", "#4361ee", "#4cc9f0",
+];
+
 const WIDTHS = [2, 4, 8];
 
 function Icon({ name }) {
@@ -104,6 +114,61 @@ function Icon({ name }) {
   }
 }
 
+function ColorPopover({ color, onColorChange, anchorRef, onClose }) {
+  const popRef = useRef(null);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (anchorRef.current) {
+      const r = anchorRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + 8, left: r.left });
+    }
+  }, [anchorRef]);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (popRef.current && !popRef.current.contains(e.target) && !anchorRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [anchorRef, onClose]);
+
+  return (
+    <div
+      ref={popRef}
+      className="wb-color-popover"
+      style={{ position: "fixed", top: pos.top, left: pos.left }}
+    >
+      <div className="wb-color-popover__grid">
+        {PALETTE.map((c) => (
+          <button
+            key={c}
+            className={`wb-color-popover__swatch ${color === c ? "is-active" : ""}`}
+            style={{ background: c }}
+            onClick={() => onColorChange(c)}
+            aria-label={`Color ${c}`}
+          />
+        ))}
+      </div>
+      <div className="wb-color-popover__custom">
+        <label className="wb-custom-color__swatch" style={{ background: color }} title="Pick custom color">
+          <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} aria-label="Custom color picker" />
+        </label>
+        <input
+          className="wb-custom-color__hex"
+          value={color}
+          onChange={(e) => onColorChange(e.target.value)}
+          spellCheck={false}
+          maxLength={7}
+          aria-label="Custom color hex value"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function Toolbar({
   tool,
   onToolChange,
@@ -118,6 +183,9 @@ export default function Toolbar({
   onClear,
   onClose,
 }) {
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const customSwatchRef = useRef(null);
+
   return (
     <aside className="wb-toolbar">
       <div className="wb-toolbar__group">
@@ -138,7 +206,7 @@ export default function Toolbar({
       <div className="wb-toolbar__divider" />
 
       <div className="wb-toolbar__group wb-toolbar__colors">
-        {COLORS.map((c) => (
+        {QUICK_COLORS.map((c) => (
           <button
             key={c}
             className={`wb-swatch ${color === c ? "is-active" : ""}`}
@@ -148,19 +216,23 @@ export default function Toolbar({
             onClick={() => onColorChange(c)}
           />
         ))}
-        <div className="wb-custom-color">
-          <label className="wb-custom-color__swatch" style={{ background: color }} title="Pick custom color">
-            <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} aria-label="Custom color picker" />
-          </label>
-          <input
-            className="wb-custom-color__hex"
-            value={color}
-            onChange={(e) => onColorChange(e.target.value)}
-            spellCheck={false}
-            maxLength={7}
-            aria-label="Custom color hex value"
+        <button
+        ref={customSwatchRef}
+        className="wb-custom-color__trigger"
+        title="More colors"
+        aria-label="More colors"
+        onClick={() => setPaletteOpen((v) => !v)}
+        >
+          +
+        </button>
+        {paletteOpen && (
+          <ColorPopover
+            color={color}
+            onColorChange={onColorChange}
+            anchorRef={customSwatchRef}
+            onClose={() => setPaletteOpen(false)}
           />
-        </div>
+        )}
       </div>
 
       <div className="wb-toolbar__divider" />
