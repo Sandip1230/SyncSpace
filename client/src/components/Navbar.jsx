@@ -12,7 +12,8 @@ const MODES = [
   { key: "whiteboard", label: "Whiteboard" },
 ];
 
-function Navbar({ roomId, mode, onModeChange }) {
+// 1. Added onOpenReplay to the destructured props
+function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
@@ -83,6 +84,13 @@ function Navbar({ roomId, mode, onModeChange }) {
         >
           Join Room
         </button>
+
+        {/* 2. Added the Replay button here: */}
+        {roomId && onOpenReplay && (
+          <button className="navbar__btn" onClick={onOpenReplay}>
+            Replay
+          </button>
+        )}
 
         {roomId && (
           <button

@@ -13,6 +13,7 @@ import { useFileSystem } from "../hooks/useFileSystem";
 import { clearShapes } from "../lib/yShapes";
 import { getStoredUsername, randomGuestName } from "../utils/helper";
 import "../components/Navbar.css";
+import ReplayPanel from "../components/ReplayPanel";
 
 function Workspace() {
   const { roomId } = useParams();
@@ -28,6 +29,7 @@ function Workspace() {
   const [strokeWidth, setStrokeWidth] = useState(4);
   const [dismissedError, setDismissedError] = useState(false);
   const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
+  const [replayOpen, setReplayOpen] = useState(false);
 
   useEffect(() => {
     if (!undoManager) return undefined;
@@ -45,7 +47,13 @@ function Workspace() {
 
   return (
     <>
-      <Navbar roomId={roomId} mode={mode} onModeChange={setMode} />
+      {/* 1. Added onOpenReplay prop here: */}
+      <Navbar
+        roomId={roomId}
+        mode={mode}
+        onModeChange={setMode}
+        onOpenReplay={() => setReplayOpen(true)}
+      />
 
       {connecting ? (
         <div className="workspace-skeleton">
@@ -57,10 +65,19 @@ function Workspace() {
         </div>
       ) : (
         <div className={`workspace-stage stage--${mode}`}>
-          <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
+          <WorkspaceSidebar
+            roomId={roomId}
+            users={users}
+            connected={!connecting}
+            fileSystem={fileSystem}
+          />
 
           <div className="workspace-panel workspace-panel--editor">
-            <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
+            <CodeEditor
+              ydoc={ydoc}
+              fileSystem={fileSystem}
+              awareness={awareness}
+            />
           </div>
 
           <div className="workspace-panel workspace-panel--whiteboard">
@@ -78,9 +95,22 @@ function Workspace() {
               onClear={() => clearShapes(yshapes)}
               onClose={() => setMode("editor")}
             />
-            <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
+            <Whiteboard
+              yshapes={yshapes}
+              tool={tool}
+              color={color}
+              strokeWidth={strokeWidth}
+            />
           </div>
         </div>
+      )}
+
+      {/* 2. Added conditional rendering near the bottom of the fragment: */}
+      {replayOpen && (
+        <ReplayPanel
+          roomId={roomId}
+          onClose={() => setReplayOpen(false)}
+        />
       )}
 
       {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}

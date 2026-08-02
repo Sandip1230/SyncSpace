@@ -33,7 +33,11 @@ async function getOrCreateRoom(roomId) {
         console.error(`Corrupted persisted state for room "${roomId}", starting fresh:`, err.message);
       }
     }
-    doc.on("update", () => { room.dirty = true; });
+    const { bufferUpdate } = require("./replayLogger");
+    doc.on("update", (update) => {
+      room.dirty = true;
+      bufferUpdate(roomId, update);
+    });
   })();
   loadingPromises.set(roomId, loadPromise);
   await loadPromise;

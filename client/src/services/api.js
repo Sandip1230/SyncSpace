@@ -70,3 +70,8 @@ export async function resetPasswordRequest(email, otp, newPassword) {
   });
   return handle(res);
 }
+
+export async function fetchReplayHistory(roomId) {
+  const res = await fetch(`${API_BASE_URL}/rooms/${roomId}/history`);
+  return handle(res);
+}
