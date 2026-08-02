@@ -132,11 +132,24 @@
   flex-direction: column;
 }
 
+.workspace-panel--whiteboard .wb-toolbar {
+  flex-shrink: 0;
+}
+
+.workspace-panel--whiteboard > *:last-child {
+  flex: 1;
+  min-height: 0;
+}
+
 .stage--editor .workspace-panel--editor {
   flex-basis: 100%;
   opacity: 1;
 }
 
+.stage--editor .code-editor__tabbar {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 .stage--editor .workspace-panel--whiteboard {
   flex-basis: 0%;
   opacity: 0;
