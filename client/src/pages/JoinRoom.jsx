@@ -19,6 +19,8 @@ function JoinRoom() {
   const [error, setError] = useState("");
 
   const handleJoin = async () => {
+    console.log("handleJoin called");
+
     const id = roomId.trim();
 
     if (!id || !username.trim()) return;
@@ -39,7 +41,10 @@ function JoinRoom() {
   };
 
   const handleKeyDown = (e) => {
+    console.log("Pressed:", e.key);
+
     if (e.key === "Enter") {
+  
       e.preventDefault();
       handleJoin();
     }
@@ -77,7 +82,7 @@ function JoinRoom() {
         {status === "checking" ? (
           <>
             <span className="page-spinner" />
-            Joining…
+            Joining...
           </>
         ) : (
           "Join Room"
