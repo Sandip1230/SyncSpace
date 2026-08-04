@@ -6,7 +6,18 @@
   background: #1f2937;
   border-bottom: 1px solid #2c3f66;
   color: #e7edf7;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.wb-toolbar__group {
+  flex-shrink: 0;
+}
+
+.wb-toolbar__spacer {
+  flex-shrink: 1;
+  min-width: 12px;
 }
 .wb-toolbar__group { display: flex; align-items: center; gap: 4px; }
 .wb-toolbar__divider { width: 1px; height: 22px; background: #2c3f66; margin: 0 6px; }
@@ -90,7 +101,7 @@
 }
 
 .wb-color-popover {
-  z-index: 1000;
+  z-index: 9999;
   background: #1f2937;
   border: 1px solid #2c3f66;
   border-radius: 10px;
