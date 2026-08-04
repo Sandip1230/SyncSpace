@@ -26,9 +26,6 @@ export function useYDoc(roomId, username) {
 
     const onSync = (state) => {
       Y.applyUpdate(ydoc, new Uint8Array(state), "remote");
-      // Only now do we actually know whether this room already has files —
-      // seeding a "default" file before this point is what caused two
-      // clients joining together to each create their own main.js.
       setSynced(true);
     };
     const onUpdate = (update) => Y.applyUpdate(ydoc, new Uint8Array(update), "remote");
@@ -62,9 +59,6 @@ export function useYDoc(roomId, username) {
       ydoc.off("update", onLocalUpdate);
       awareness.off("update", onAwarenessChange);
       awarenessProtocol.removeAwarenessStates(awareness, [ydoc.clientID], "local");
-      undoManager.destroy();
-      awareness.destroy();
-      ydoc.destroy();
     };
   }, [ydoc, roomId, undoManager, awareness, username]);
 
