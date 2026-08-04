@@ -7,7 +7,9 @@ let autosaveTimer = null;
 async function loadState(roomId) {
   try {
     const record = await Space.findOne({ spaceId: roomId }).lean();
-    return record ? record.documentState : null;
+    const state = record ? record.documentState : null;
+    console.log(`[loadState] room ${roomId}, found: ${!!state}, bytes: ${state ? state.length : 0}`);
+    return state;
   } catch (err) {
     console.error(`Failed to load persisted state for room ${roomId}:`, err.message);
     return null;
@@ -17,6 +19,7 @@ async function loadState(roomId) {
 async function saveState(roomId, doc) {
   try {
     const state = Buffer.from(Y.encodeStateAsUpdate(doc));
+    console.log(`[saveState] room ${roomId}, bytes: ${state.length}`);
     await Space.updateOne(
       { spaceId: roomId },
       { $set: { documentState: state, lastSavedAt: new Date() } },

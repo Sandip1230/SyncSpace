@@ -2,7 +2,7 @@ const Y = require("yjs");
 const { getOrCreateRoom, getRoom } = require("./roomStore");
 const { isValidRoomId } = require("./validators");
 
-const RATE_LIMIT = 50;
+const RATE_LIMIT = 300;
 const RATE_WINDOW_MS = 1000;
 
 function withinRateLimit(socket) {
@@ -12,6 +12,7 @@ function withinRateLimit(socket) {
     socket.data.rateCount = 0;
   }
   socket.data.rateCount += 1;
+  console.log(`[rateLimit] socket ${socket.id}, count: ${socket.data.rateCount}, windowAge: ${now - socket.data.rateWindowStart}ms`);
   return socket.data.rateCount <= RATE_LIMIT;
 }
 
