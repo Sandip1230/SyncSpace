@@ -122,7 +122,7 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
           <div className="share-modal">
             <h2>Share Meeting</h2>
 
-            <label>Meeting ID</label>
+            <label>Room ID</label>
 
             <div className="share-field">
               <input value={roomId} readOnly />
@@ -131,7 +131,7 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
               </button>
             </div>
 
-            <label>Meeting Link</label>
+            <label>Room Link</label>
 
             <div className="share-field">
               <input value={meetingLink} readOnly />
