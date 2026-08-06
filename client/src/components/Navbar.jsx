@@ -44,7 +44,7 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
       <div className="navbar">
         <Link to="/" className="navbar__brand">
           <Logo />
-          <h2>SyncSpace</h2>
+          <h2> SyncSpace </h2>
         </Link>
 
         {roomId && onModeChange && (
