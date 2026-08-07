@@ -48,3 +48,13 @@
   padding: 2px 6px;
   border-radius: var(--radius-pill);
 }
+
+.sidebar__activity {
+  margin-left: 6px;
+  font-size: 10px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.sidebar__activity--editing { color: var(--accent); }
+.sidebar__activity--drawing { color: var(--success); }

@@ -10,7 +10,7 @@ function genId() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function Whiteboard({ yshapes, tool, color, strokeWidth }) {
+function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
   const containerRef = useRef(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [shapes, setShapes] = useState([]);
