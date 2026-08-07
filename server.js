@@ -14,6 +14,7 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 const authRouter = require("./routes/auth");
 const pingHandler = require("./sockets/pingHandler");
 const replayRouter = require("./routes/replay");
+const chatTypingHandler = require("./sockets/chatTypingHandler");
 
 const PORT = process.env.PORT || 5000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "*";
@@ -39,6 +40,7 @@ io.on("connection", (socket) => {
   yjsHandler(io, socket);
   pingHandler(io, socket);
   joinRequestHandler(io, socket);
+  chatTypingHandler(io, socket);
 });
 
 connectDB().then(() => {

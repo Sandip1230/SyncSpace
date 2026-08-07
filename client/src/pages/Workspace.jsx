@@ -226,7 +226,7 @@
 
         {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}
 
-        <ChatPanel ychat={ychat} username={username} />
+        <ChatPanel ychat={ychat} username={username} roomId={roomId} />
       </>
     );
   }

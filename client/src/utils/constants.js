@@ -12,6 +12,7 @@ export const SOCKET_EVENTS = {
   YJS_SYNC: "yjs:sync",
   YJS_UPDATE: "yjs:update",
   AWARENESS_UPDATE: "awareness:update",
+  CHAT_TYPING: "chat:typing",
 
 
   ROOM_REQUEST_JOIN: "room:request-join",
