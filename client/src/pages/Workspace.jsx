@@ -175,8 +175,7 @@
           </div>
         ) : (
           <div className={`workspace-stage stage--${mode}`}>
-              <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
-
+            <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} awareness={awareness} />
               <div
                 ref={splitAreaRef}
                 className={`workspace-split-area${isResizing ? " is-resizing" : ""}`}
@@ -217,7 +216,7 @@
                     onClear={() => clearShapes(yshapes)}
                     onClose={() => setMode("editor")}
                   />
-                  <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
+                  <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} awareness={awareness} />
                 </div>
               </div>
             </div>

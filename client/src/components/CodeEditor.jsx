@@ -108,6 +108,22 @@ function CodeEditor({ fileSystem, awareness }) {
     setTerminalOpen(true);
   };
 
+  useEffect(() => {
+    if (!editorInstance || !awareness) return undefined;
+    let idleTimer = null;
+    const disposable = editorInstance.onDidChangeModelContent(() => {
+      awareness.setLocalStateField("activity", "editing");
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        awareness.setLocalStateField("activity", "idle");
+      }, 2000);
+    });
+    return () => {
+      disposable.dispose();
+      clearTimeout(idleTimer);
+    };
+  }, [editorInstance, awareness]);
+
   return (
     <div className="code-editor">
       <div className="code-editor__tabbar">

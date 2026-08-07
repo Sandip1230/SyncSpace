@@ -124,3 +124,13 @@
   border-radius: var(--radius-pill);
   flex-shrink: 0;
 }
+
+.sidebar__activity {
+  margin-left: 6px;
+  font-size: 10px;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.sidebar__activity--editing { color: var(--accent); }
+.sidebar__activity--drawing { color: var(--success); }

@@ -1,3 +1,4 @@
+import { useAwareness } from "../hooks/useAwareness";
 import { useState } from "react";
 import "./Sidebar.css";
 
@@ -7,7 +8,9 @@ function stringToColor(str) {
   return `hsl(${Math.abs(hash) % 360}, 65%, 55%)`;
 }
 
-function Sidebar({ roomId, users = [], connected }) {
+function Sidebar({ roomId, users = [], connected, awareness }) {
+  const awarenessStates = useAwareness(awareness);
+  const activityByName = Object.fromEntries(awarenessStates.map((s) => [s.name, s.activity]));
   const [copied, setCopied] = useState(false);
 
   const copyRoomId = () => {
@@ -39,23 +42,18 @@ function Sidebar({ roomId, users = [], connected }) {
         </div>
       </div>
 
-      <div className="sidebar__card sidebar__card--users">
-        <div className="sidebar__card-header">
-          <span className="sidebar__section-label">Online</span>
-          <span className="sidebar__count-badge">{users.length}</span>
-        </div>
-        {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
-        <div className="sidebar__users">
-          {users.map((u) => (
-            <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
-              <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
-                {(u.username || "?").slice(0, 1).toUpperCase()}
-              </span>
-              <span className="sidebar__username">{u.username}</span>
-              {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
-            </div>
-          ))}
-        </div>
+      <div className="sidebar__section-label">Online ({users.length})</div>
+      {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
+      <div className="sidebar__users">
+        {users.map((u) => (
+          <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
+            <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
+              {(u.username || "?").slice(0, 1).toUpperCase()}
+            </span>
+            <span className="sidebar__username">{u.username}</span>
+            {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
+          </div>
+        ))}
       </div>
     </div>
   );
