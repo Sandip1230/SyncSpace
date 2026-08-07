@@ -19,7 +19,7 @@ async function getOrCreateRoom(roomId) {
   }
 
   const doc = new Y.Doc();
-  room = { doc, users: new Map(), dirty: false, adminSocketId: null };
+  room = { doc, users: new Map(), dirty: false, adminSocketId: null, pending: new Map() };
   rooms.set(roomId, room);
 
   const loadPromise = (async () => {

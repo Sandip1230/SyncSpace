@@ -1,10 +1,11 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiSettings } from "react-icons/fi";
 import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import "./Navbar.css";
 import PingIndicator from "./PingIndicator";
+import JoinRequestBell from "./JoinRequestBell";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const MODES = [
   { key: "editor", label: "Editor" },
@@ -12,11 +13,29 @@ const MODES = [
   { key: "whiteboard", label: "Whiteboard" },
 ];
 
-function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
+function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequests, onApproveJoin, onDenyJoin }) {
   const navigate = useNavigate();
 
   const [copied, setCopied] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
+  const modeRefs = useRef({});
+  const [indicatorRect, setIndicatorRect] = useState({ left: 3, width: 0 });
+
+  const measureIndicator = () => {
+    const btn = modeRefs.current[mode];
+    if (btn) {
+      setIndicatorRect({ left: btn.offsetLeft, width: btn.offsetWidth });
+    }
+  };
+
+useLayoutEffect(measureIndicator, [mode]);
+
+useEffect(() => {
+  window.addEventListener("resize", measureIndicator);
+  return () => window.removeEventListener("resize", measureIndicator);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [mode]);
 
   const meetingLink = window.location.href;
 
@@ -34,35 +53,27 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
     setTimeout(() => setCopied(false), 1500);
   };
 
-  const activeIndex = Math.max(
-    0,
-    MODES.findIndex((m) => m.key === mode)
-  );
 
   return (
     <>
       <div className="navbar">
         <Link to="/" className="navbar__brand">
           <Logo />
-          <h2>SyncSpace</h2>
+          <h2> SyncSpace </h2>
         </Link>
 
         {roomId && onModeChange && (
-          <div
-            className="mode-toggle"
-            style={{
-              "--mode-count": MODES.length,
-              "--mode-index": activeIndex,
-            }}
-          >
-            <span className="mode-toggle__indicator" />
+          <div className="mode-toggle">
+            <span
+              className="mode-toggle__indicator"
+              style={{ left: `${indicatorRect.left}px`, width: `${indicatorRect.width}px` }}
+            />
 
             {MODES.map((m) => (
               <button
                 key={m.key}
-                className={`mode-toggle__btn ${
-                  mode === m.key ? "is-active" : ""
-                }`}
+                ref={(el) => (modeRefs.current[m.key] = el)}
+                className={`mode-toggle__btn ${mode === m.key ? "is-active" : ""}`}
                 onClick={() => onModeChange(m.key)}
               >
                 {m.label}
@@ -72,6 +83,9 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
         )}
 
         <div className="navbar__actions">
+          {isAdmin && pendingRequests && (
+          <JoinRequestBell requests={pendingRequests} onApprove={onApproveJoin} onDeny={onDenyJoin} />
+          )}
           <PingIndicator />
           <ThemeToggle />
 
