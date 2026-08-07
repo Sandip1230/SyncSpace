@@ -1,4 +1,3 @@
-  import { useEffect, useState } from "react";
   import { useParams } from "react-router-dom";
   import Navbar from "../components/Navbar";
   import WorkspaceSidebar from "../components/WorkspaceSidebar";
@@ -14,6 +13,7 @@
   import { getStoredUsername, randomGuestName } from "../utils/helper";
   import "../components/Navbar.css";
   import ReplayPanel from "../components/ReplayPanel";
+  import { useEffect, useRef, useState } from "react";
 
   function Workspace() {
     const { roomId } = useParams();
@@ -39,6 +39,48 @@
     const [dismissedError, setDismissedError] = useState(false);
     const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
     const [replayOpen, setReplayOpen] = useState(false);
+
+    const splitAreaRef = useRef(null);
+    const [splitRatio, setSplitRatio] = useState(50); // % width given to the editor panel
+    const [isResizing, setIsResizing] = useState(false);
+
+    const clampRatio = (val) => Math.min(80, Math.max(20, val));
+
+    const handleSplitterPointerDown = (e) => {
+      e.preventDefault();
+      setIsResizing(true);
+    };
+
+    useEffect(() => {
+      if (!isResizing) return undefined;
+
+      const handlePointerMove = (e) => {
+        const area = splitAreaRef.current;
+        if (!area) return;
+        const rect = area.getBoundingClientRect();
+        // supports the mobile breakpoint where the stage stacks vertically
+        const isColumn = getComputedStyle(area).flexDirection === "column";
+        const point = e.touches ? e.touches[0] : e;
+        const ratio = isColumn
+          ? ((point.clientY - rect.top) / rect.height) * 100
+          : ((point.clientX - rect.left) / rect.width) * 100;
+        setSplitRatio(clampRatio(ratio));
+      };
+
+      const handlePointerUp = () => setIsResizing(false);
+
+      window.addEventListener("mousemove", handlePointerMove);
+      window.addEventListener("mouseup", handlePointerUp);
+      window.addEventListener("touchmove", handlePointerMove, { passive: false });
+      window.addEventListener("touchend", handlePointerUp);
+
+      return () => {
+        window.removeEventListener("mousemove", handlePointerMove);
+        window.removeEventListener("mouseup", handlePointerUp);
+        window.removeEventListener("touchmove", handlePointerMove);
+        window.removeEventListener("touchend", handlePointerUp);
+      };
+    }, [isResizing]);
 
     useEffect(() => {
       if (!undoManager) return undefined;
@@ -133,30 +175,52 @@
           </div>
         ) : (
           <div className={`workspace-stage stage--${mode}`}>
-            <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
+              <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
 
-            <div className="workspace-panel workspace-panel--editor">
-              <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
-            </div>
+              <div
+                ref={splitAreaRef}
+                className={`workspace-split-area${isResizing ? " is-resizing" : ""}`}
+              >
+                <div
+                  className="workspace-panel workspace-panel--editor"
+                  style={mode === "split" ? { flexBasis: `${splitRatio}%` } : undefined}
+                >
+                  <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
+                </div>
 
-            <div className="workspace-panel workspace-panel--whiteboard">
-              <Toolbar
-                tool={tool}
-                onToolChange={setTool}
-                color={color}
-                onColorChange={setColor}
-                strokeWidth={strokeWidth}
-                onStrokeWidthChange={setStrokeWidth}
-                onUndo={() => undoManager.undo()}
-                onRedo={() => undoManager.redo()}
-                canUndo={undoState.canUndo}
-                canRedo={undoState.canRedo}
-                onClear={() => clearShapes(yshapes)}
-                onClose={() => setMode("editor")}
-              />
-              <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
+                {mode === "split" && (
+                  <div
+                    className="workspace-splitter"
+                    onMouseDown={handleSplitterPointerDown}
+                    onTouchStart={handleSplitterPointerDown}
+                    role="separator"
+                    aria-orientation="vertical"
+                    aria-label="Resize editor and whiteboard panels"
+                  />
+                )}
+
+                <div
+                  className="workspace-panel workspace-panel--whiteboard"
+                  style={mode === "split" ? { flexBasis: `${100 - splitRatio}%` } : undefined}
+                >
+                  <Toolbar
+                    tool={tool}
+                    onToolChange={setTool}
+                    color={color}
+                    onColorChange={setColor}
+                    strokeWidth={strokeWidth}
+                    onStrokeWidthChange={setStrokeWidth}
+                    onUndo={() => undoManager.undo()}
+                    onRedo={() => undoManager.redo()}
+                    canUndo={undoState.canUndo}
+                    canRedo={undoState.canRedo}
+                    onClear={() => clearShapes(yshapes)}
+                    onClose={() => setMode("editor")}
+                  />
+                  <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
+                </div>
+              </div>
             </div>
-          </div>
         )}
 
         {replayOpen && <ReplayPanel roomId={roomId} onClose={() => setReplayOpen(false)} />}

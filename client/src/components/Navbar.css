@@ -180,6 +180,71 @@
   }
 }
 
+/* ---- resizable splitter ---- */
+.workspace-split-area {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.workspace-split-area.is-resizing {
+  user-select: none;
+  cursor: col-resize;
+}
+
+.workspace-split-area.is-resizing .workspace-panel {
+  transition: none; /* avoid laggy drag while flex-basis animates */
+}
+
+.workspace-splitter {
+  width: 6px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+  cursor: col-resize;
+  background: transparent;
+  touch-action: none;
+}
+
+.workspace-splitter::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  transition: background 0.15s ease;
+}
+
+.workspace-splitter:hover::before,
+.workspace-split-area.is-resizing .workspace-splitter::before {
+  background: #3fc6d6; /* matches the app's cyan accent */
+}
+
+@media (max-width: 860px) {
+  .workspace-split-area {
+    flex-direction: column;
+  }
+
+  .workspace-splitter {
+    width: 100%;
+    height: 6px;
+    cursor: row-resize;
+  }
+
+  .workspace-splitter::before {
+    top: 2px;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+}
+
 .workspace-skeleton {
   height: 90vh;
   padding: 16px;
