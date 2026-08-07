@@ -18,35 +18,44 @@ function Sidebar({ roomId, users = [], connected }) {
 
   return (
     <div className="sidebar">
-      <div className="sidebar__section-label">Room</div>
-      <div className="sidebar__room-row">
-        <code className="sidebar__room-id">{roomId}</code>
-        <button className={`sidebar__copy-btn ${copied ? "is-copied" : ""}`} onClick={copyRoomId} title="Copy room ID">
-          {copied ? (
-            <>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              Copied
-            </>
-          ) : "Copy"}
-        </button>
-      </div>
-      <div className="sidebar__status">
-        <span className={`sidebar__status-dot ${connected ? "is-live" : "is-offline"}`} />
-        {connected ? "Live" : "Offline"}
+      <div className="sidebar__card">
+        <div className="sidebar__card-header">
+          <span className="sidebar__section-label">Room</span>
+          <span className="sidebar__status">
+            <span className={`sidebar__status-dot ${connected ? "is-live" : "is-offline"}`} />
+            {connected ? "Live" : "Offline"}
+          </span>
+        </div>
+        <div className="sidebar__room-row">
+          <code className="sidebar__room-id">{roomId}</code>
+          <button className={`sidebar__copy-btn ${copied ? "is-copied" : ""}`} onClick={copyRoomId} title="Copy room ID">
+            {copied ? (
+              <>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                Copied
+              </>
+            ) : "Copy"}
+          </button>
+        </div>
       </div>
 
-      <div className="sidebar__section-label">Online ({users.length})</div>
-      {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
-      <div className="sidebar__users">
-        {users.map((u) => (
-          <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
-            <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
-              {(u.username || "?").slice(0, 1).toUpperCase()}
-            </span>
-            <span className="sidebar__username">{u.username}</span>
-            {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
-          </div>
-        ))}
+      <div className="sidebar__card sidebar__card--users">
+        <div className="sidebar__card-header">
+          <span className="sidebar__section-label">Online</span>
+          <span className="sidebar__count-badge">{users.length}</span>
+        </div>
+        {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
+        <div className="sidebar__users">
+          {users.map((u) => (
+            <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
+              <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
+                {(u.username || "?").slice(0, 1).toUpperCase()}
+              </span>
+              <span className="sidebar__username">{u.username}</span>
+              {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
