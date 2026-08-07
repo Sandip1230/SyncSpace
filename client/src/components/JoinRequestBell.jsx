@@ -34,18 +34,20 @@ function JoinRequestBell({ requests, onApprove, onDeny }) {
         <div className="join-bell__panel">
           <div className="join-bell__caret" />
           <div className="join-bell__header">Waiting to join ({requests.length})</div>
-          {requests.map((r) => (
-            <div key={r.requesterId} className="join-bell__row">
-              <span className="join-bell__avatar" style={{ background: stringToColor(r.username) }}>
-                {(r.username || "?").slice(0, 1).toUpperCase()}
-              </span>
-              <span className="join-bell__name">{r.username}</span>
-              <div className="join-bell__actions">
-                <button className="join-bell__approve" onClick={() => onApprove(r.requesterId)}>Approve</button>
-                <button className="join-bell__deny" onClick={() => onDeny(r.requesterId)}>Deny</button>
+          <div className="join-bell__list">
+            {requests.map((r) => (
+              <div key={r.requesterId} className="join-bell__row">
+                <span className="join-bell__avatar" style={{ background: stringToColor(r.username) }}>
+                  {(r.username || "?").slice(0, 1).toUpperCase()}
+                </span>
+                <span className="join-bell__name">{r.username}</span>
+                <div className="join-bell__actions">
+                  <button className="join-bell__approve" onClick={() => onApprove(r.requesterId)}>Approve</button>
+                  <button className="join-bell__deny" onClick={() => onDeny(r.requesterId)}>Deny</button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

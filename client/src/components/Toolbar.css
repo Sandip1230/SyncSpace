@@ -5,6 +5,7 @@
   padding: 8px 12px;
   background: #1f2937;
   border-bottom: 1px solid #2c3f66;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   color: #e7edf7;
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -20,21 +21,42 @@
   min-width: 12px;
 }
 .wb-toolbar__group { display: flex; align-items: center; gap: 4px; }
-.wb-toolbar__divider { width: 1px; height: 22px; background: #2c3f66; margin: 0 6px; }
+.wb-toolbar__divider {
+  width: 1px; height: 22px;
+  background: linear-gradient(180deg, transparent, #2c3f66, transparent);
+  margin: 0 6px;
+}
 .wb-toolbar__spacer { flex: 1; }
 .wb-tool {
   width: 32px; height: 32px;
   display: inline-flex; align-items: center; justify-content: center;
   background: transparent; border: 1px solid transparent; border-radius: 6px;
   color: #a9b8d4; cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
-.wb-tool:hover { background: #2c3f6680; color: #fff; }
-.wb-tool.is-active { background: #3fc6d633; border-color: #3fc6d6; color: #3fc6d6; }
+.wb-tool:hover { background: #2c3f6680; color: #fff; transform: translateY(-1px); }
+.wb-tool:active { transform: translateY(0) scale(0.94); }
+.wb-tool.is-active {
+  background: #3fc6d633;
+  border-color: #3fc6d6;
+  color: #3fc6d6;
+  box-shadow: 0 0 0 3px #3fc6d61a;
+}
 .wb-tool--danger:hover { background: #ff6b6b33; color: #ff6b6b; }
 .wb-tool--close { color: #a9b8d4; }
+
 .wb-swatch {
   width: 22px; height: 22px; border-radius: 50%;
   border: 2px solid transparent; cursor: pointer; padding: 0;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.wb-swatch:hover {
+  transform: scale(1.15);
+}
+.wb-swatch.is-active {
+  border-color: #e7edf7;
+  box-shadow: 0 0 0 2px #0b1526, 0 0 0 4px #3fc6d6;
+  transform: scale(1.1);
 }
 .wb-custom-color {
   display: flex;
