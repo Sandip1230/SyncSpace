@@ -2,14 +2,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  row-gap: 8px;
   padding: 8px 12px;
   background: #1f2937;
   border-bottom: 1px solid #2c3f66;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   color: #e7edf7;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: auto;
+  flex-wrap: wrap;
+  overflow: visible;
 }
 
 .wb-toolbar__group {
@@ -17,14 +16,18 @@
 }
 
 .wb-toolbar__spacer {
-  flex-shrink: 1;
+  flex: 1 1 0%;
   min-width: 12px;
 }
+
 .wb-toolbar__group { display: flex; align-items: center; gap: 4px; }
 .wb-toolbar__divider {
-  width: 1px; height: 22px;
-  background: linear-gradient(180deg, transparent, #2c3f66, transparent);
+  width: 1px;
+  height: 22px;
+  background: #2c3f66;
   margin: 0 6px;
+  align-self: stretch;
+  flex-shrink: 0;
 }
 .wb-toolbar__spacer { flex: 1; }
 .wb-tool {
