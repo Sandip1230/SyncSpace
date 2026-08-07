@@ -1,131 +1,171 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import WorkspaceSidebar from "../components/WorkspaceSidebar";
-import Toolbar from "../components/Toolbar";
-import Whiteboard from "../components/Whiteboard";
-import CodeEditor from "../components/CodeEditor";
-import Toast from "../components/Toast";
-import ChatPanel from "../components/ChatPanel";
-import { useSocket } from "../hooks/useSocket";
-import { useYDoc } from "../hooks/useYDoc";
-import { useFileSystem } from "../hooks/useFileSystem";
-import { clearShapes } from "../lib/yShapes";
-import { getStoredUsername, randomGuestName } from "../utils/helper";
-import "../components/Navbar.css";
-import ReplayPanel from "../components/ReplayPanel";
+  import { useEffect, useState } from "react";
+  import { useParams } from "react-router-dom";
+  import Navbar from "../components/Navbar";
+  import WorkspaceSidebar from "../components/WorkspaceSidebar";
+  import Toolbar from "../components/Toolbar";
+  import Whiteboard from "../components/Whiteboard";
+  import CodeEditor from "../components/CodeEditor";
+  import Toast from "../components/Toast";
+  import ChatPanel from "../components/ChatPanel";
+  import { useSocket } from "../hooks/useSocket";
+  import { useYDoc } from "../hooks/useYDoc";
+  import { useFileSystem } from "../hooks/useFileSystem";
+  import { clearShapes } from "../lib/yShapes";
+  import { getStoredUsername, randomGuestName } from "../utils/helper";
+  import "../components/Navbar.css";
+  import ReplayPanel from "../components/ReplayPanel";
 
-function Workspace() {
-  const { roomId } = useParams();
-  const [username] = useState(getStoredUsername() || randomGuestName());
+  function Workspace() {
+    const { roomId } = useParams();
+    const [username] = useState(getStoredUsername() || randomGuestName());
 
-  const {
-    connecting,
-    users,
-    error,
-    joinStatus,
-    isAdmin,
-    pendingRequests,
-    approveJoin,
-    denyJoin,
-  } = useSocket(roomId, username);
-  const { ydoc, fileTreeMap, yshapes, ychat, undoManager, awareness, synced } = useYDoc(roomId, username);
-  const fileSystem = useFileSystem(ydoc, fileTreeMap, synced);
+    const {
+      connecting,
+      users,
+      error,
+      joinStatus,
+      isAdmin,
+      pendingRequests,
+      approveJoin,
+      denyJoin,
+    } = useSocket(roomId, username);
+    const { ydoc, fileTreeMap, yshapes, ychat, undoManager, awareness, synced } = useYDoc(roomId, username);
+    const fileSystem = useFileSystem(ydoc, fileTreeMap, synced);
 
-  const [mode, setMode] = useState("split");
-  const [tool, setTool] = useState("pen");
-  const [color, setColor] = useState("#3fc6d6");
-  const [strokeWidth, setStrokeWidth] = useState(4);
-  const [dismissedError, setDismissedError] = useState(false);
-  const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
-  const [replayOpen, setReplayOpen] = useState(false);
+    const [mode, setMode] = useState("split");
+    const [tool, setTool] = useState("pen");
+    const [color, setColor] = useState("#3fc6d6");
+    const [strokeWidth, setStrokeWidth] = useState(4);
+    const [dismissedError, setDismissedError] = useState(false);
+    const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
+    const [replayOpen, setReplayOpen] = useState(false);
 
-  useEffect(() => {
-    if (!undoManager) return undefined;
-    const refresh = () => setUndoState({ canUndo: undoManager.canUndo(), canRedo: undoManager.canRedo() });
-    refresh();
-    undoManager.on("stack-item-added", refresh);
-    undoManager.on("stack-item-popped", refresh);
-    undoManager.on("stack-cleared", refresh);
-    return () => {
-      undoManager.off("stack-item-added", refresh);
-      undoManager.off("stack-item-popped", refresh);
-      undoManager.off("stack-cleared", refresh);
-    };
-  }, [undoManager]);
+    useEffect(() => {
+      if (!undoManager) return undefined;
+      const refresh = () => setUndoState({ canUndo: undoManager.canUndo(), canRedo: undoManager.canRedo() });
+      refresh();
+      undoManager.on("stack-item-added", refresh);
+      undoManager.on("stack-item-popped", refresh);
+      undoManager.on("stack-cleared", refresh);
+      return () => {
+        undoManager.off("stack-item-added", refresh);
+        undoManager.off("stack-item-popped", refresh);
+        undoManager.off("stack-cleared", refresh);
+      };
+    }, [undoManager]);
 
-  if (joinStatus === "pending" || joinStatus === "idle") {
+    if (joinStatus === "pending" || joinStatus === "idle") {
     return (
-      <div className="waiting-approval">
-        <div className="waiting-approval__spinner" />
-        <p>Waiting for the admin to let you in…</p>
+      <div className="waiting-approval-overlay">
+        <div className="waiting-approval-card">
+          <div className="waiting-approval__beacon">
+            <div className="beacon-ring beacon-ring--1" />
+            <div className="beacon-ring beacon-ring--2" />
+            <div className="beacon-core">
+              <span className="beacon-icon">🔒</span>
+            </div>
+          </div>
+
+          <div className="waiting-approval__badge">
+            ROOM ID &bull; <span>{roomId}</span>
+          </div>
+
+          <h2 className="waiting-approval__title">Waiting for Access</h2>
+          <p className="waiting-approval__subtitle">
+            We&apos;ve sent a request to the room admin. You&apos;ll be brought into the workspace automatically once approved.
+          </p>
+
+          <div className="waiting-approval__user">
+            <span className="user-label">Joining as</span>
+            <span className="user-name">{username}</span>
+          </div>
+        </div>
       </div>
     );
   }
+
   if (joinStatus === "denied") {
     return (
-      <div className="waiting-approval waiting-approval--denied">
-        <p>The admin denied your request to join this room.</p>
+      <div className="waiting-approval-overlay">
+        <div className="waiting-approval-card waiting-approval-card--denied">
+          <div className="waiting-approval__beacon waiting-approval__beacon--denied">
+            <div className="beacon-core">
+              <span className="beacon-icon">✕</span>
+            </div>
+          </div>
+
+          <h2 className="waiting-approval__title">Access Denied</h2>
+          <p className="waiting-approval__subtitle">
+            The room admin declined your request to join room <strong>{roomId}</strong>.
+          </p>
+
+          <button
+            className="waiting-approval__btn"
+            onClick={() => (window.location.href = "/")}
+          >
+            Return to Home
+          </button>
+        </div>
       </div>
     );
   }
 
-  return (
-    <>
-      <Navbar
-        roomId={roomId}
-        mode={mode}
-        onModeChange={setMode}
-        onOpenReplay={() => setReplayOpen(true)}
-        isAdmin={isAdmin}
-        pendingRequests={pendingRequests}
-        onApproveJoin={approveJoin}
-        onDenyJoin={denyJoin}
-      />
+    return (
+      <>
+        <Navbar
+          roomId={roomId}
+          mode={mode}
+          onModeChange={setMode}
+          onOpenReplay={() => setReplayOpen(true)}
+          isAdmin={isAdmin}
+          pendingRequests={pendingRequests}
+          onApproveJoin={approveJoin}
+          onDenyJoin={denyJoin}
+        />
 
-      {connecting ? (
-        <div className="workspace-skeleton">
-          <div className="workspace-skeleton__bar" />
-          <div className="workspace-skeleton__panels">
-            <div className="workspace-skeleton__panel" />
-            <div className="workspace-skeleton__panel" />
+        {connecting ? (
+          <div className="workspace-skeleton">
+            <div className="workspace-skeleton__bar" />
+            <div className="workspace-skeleton__panels">
+              <div className="workspace-skeleton__panel" />
+              <div className="workspace-skeleton__panel" />
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className={`workspace-stage stage--${mode}`}>
-          <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
+        ) : (
+          <div className={`workspace-stage stage--${mode}`}>
+            <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
 
-          <div className="workspace-panel workspace-panel--editor">
-            <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
+            <div className="workspace-panel workspace-panel--editor">
+              <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
+            </div>
+
+            <div className="workspace-panel workspace-panel--whiteboard">
+              <Toolbar
+                tool={tool}
+                onToolChange={setTool}
+                color={color}
+                onColorChange={setColor}
+                strokeWidth={strokeWidth}
+                onStrokeWidthChange={setStrokeWidth}
+                onUndo={() => undoManager.undo()}
+                onRedo={() => undoManager.redo()}
+                canUndo={undoState.canUndo}
+                canRedo={undoState.canRedo}
+                onClear={() => clearShapes(yshapes)}
+                onClose={() => setMode("editor")}
+              />
+              <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
+            </div>
           </div>
+        )}
 
-          <div className="workspace-panel workspace-panel--whiteboard">
-            <Toolbar
-              tool={tool}
-              onToolChange={setTool}
-              color={color}
-              onColorChange={setColor}
-              strokeWidth={strokeWidth}
-              onStrokeWidthChange={setStrokeWidth}
-              onUndo={() => undoManager.undo()}
-              onRedo={() => undoManager.redo()}
-              canUndo={undoState.canUndo}
-              canRedo={undoState.canRedo}
-              onClear={() => clearShapes(yshapes)}
-              onClose={() => setMode("editor")}
-            />
-            <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
-          </div>
-        </div>
-      )}
+        {replayOpen && <ReplayPanel roomId={roomId} onClose={() => setReplayOpen(false)} />}
 
-      {replayOpen && <ReplayPanel roomId={roomId} onClose={() => setReplayOpen(false)} />}
+        {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}
 
-      {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}
+        <ChatPanel ychat={ychat} username={username} />
+      </>
+    );
+  }
 
-      <ChatPanel ychat={ychat} username={username} />
-    </>
-  );
-}
-
-export default Workspace;
+  export default Workspace;

@@ -433,3 +433,171 @@
 .join-bell__deny:active {
   transform: translateY(1px);
 }
+
+/* --- Overlay Background --- */
+.waiting-approval-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(63, 198, 214, 0.15), transparent 60%),
+    linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+  color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 9999;
+  padding: 1.5rem;
+}
+
+/* --- Glassmorphic Card --- */
+.waiting-approval-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(22, 27, 34, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* --- Pulsing Beacon Animation --- */
+.waiting-approval__beacon {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.beacon-core {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(63, 198, 214, 0.2), rgba(63, 198, 214, 0.05));
+  border: 1px solid rgba(63, 198, 214, 0.4);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 20px rgba(63, 198, 214, 0.25);
+}
+
+.beacon-icon {
+  font-size: 1.4rem;
+}
+
+.beacon-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #3fc6d6;
+  opacity: 0;
+  animation: beacon-pulse 2.8s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.beacon-ring--2 {
+  animation-delay: 1.4s;
+}
+
+@keyframes beacon-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* --- Badge & Typography --- */
+.waiting-approval__badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #8b949e;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.waiting-approval__badge span {
+  color: #3fc6d6;
+  font-family: monospace;
+}
+
+.waiting-approval__title {
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.waiting-approval__subtitle {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #8b949e;
+  margin: 0 0 1.75rem;
+}
+
+/* --- User Info Pill --- */
+.waiting-approval__user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+}
+
+.user-label {
+  color: #6e7681;
+}
+
+.user-name {
+  color: #e6edf3;
+  font-weight: 600;
+}
+
+/* --- Denied State Styling --- */
+.waiting-approval-card--denied {
+  border-color: rgba(248, 81, 73, 0.3);
+}
+
+.waiting-approval__beacon--denied .beacon-core {
+  background: rgba(248, 81, 73, 0.15);
+  border-color: rgba(248, 81, 73, 0.5);
+  box-shadow: 0 0 20px rgba(248, 81, 73, 0.25);
+  color: #f85149;
+}
+
+.waiting-approval__btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6edf3;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.65rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.waiting-approval__btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.25);
+}
