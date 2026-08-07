@@ -33,20 +33,42 @@ function roomHandler(io, socket) {
 function leaveCurrentRoom(io, socket) {
   const roomId = socket.data.roomId;
   if (!roomId) return;
+
   const room = getRoom(roomId);
   if (room) {
     room.users.delete(socket.id);
 
+    // --- ADMIN HANDOFF & PENDING REQUEST TRANSFER ---
     if (room.adminSocketId === socket.id) {
       const nextAdmin = room.users.keys().next().value || null;
       room.adminSocketId = nextAdmin;
+
       // Let everyone still in the room know the fresh admin status.
       io.to(roomId).emit("room:users", listUsers(roomId));
+
+      if (nextAdmin) {
+        // Hand off anything the outgoing admin hadn't gotten to.
+        for (const [requesterId, req] of room.pending.entries()) {
+          io.to(nextAdmin).emit("room:incoming-join-request", {
+            requesterId,
+            username: req.username,
+          });
+        }
+      } else {
+        // No one left to approve anyone — let pending requesters in rather
+        // than strand them.
+        for (const requesterId of room.pending.keys()) {
+          io.to(requesterId).emit("room:join-approved");
+        }
+        room.pending.clear();
+      }
     }
+    // ------------------------------------------------
 
     socket.to(roomId).emit("room:user-left", { socketId: socket.id });
     scheduleEvictionIfEmpty(roomId);
   }
+
   socket.leave(roomId);
   socket.data.roomId = null;
 }

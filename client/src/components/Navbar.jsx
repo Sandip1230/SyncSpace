@@ -5,6 +5,7 @@ import Logo from "./Logo";
 import ThemeToggle from "./ThemeToggle";
 import "./Navbar.css";
 import PingIndicator from "./PingIndicator";
+import JoinRequestBell from "./JoinRequestBell";
 
 const MODES = [
   { key: "editor", label: "Editor" },
@@ -12,7 +13,7 @@ const MODES = [
   { key: "whiteboard", label: "Whiteboard" },
 ];
 
-function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
+function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequests, onApproveJoin, onDenyJoin }) {
   const navigate = useNavigate();
 
   const [copied, setCopied] = useState(false);
@@ -72,6 +73,9 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay }) {
         )}
 
         <div className="navbar__actions">
+          {isAdmin && pendingRequests && (
+          <JoinRequestBell requests={pendingRequests} onApprove={onApproveJoin} onDeny={onDenyJoin} />
+          )}
           <PingIndicator />
           <ThemeToggle />
 

@@ -302,3 +302,134 @@
 .close-btn:hover {
   background: #dc2626;
 }
+
+.join-bell-wrap {
+  position: relative;
+}
+.join-bell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 107, 107, 0.18);
+  border: 1px solid #ff6b6b;
+  color: #ffb4b4;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  animation: join-bell-glow 1.4s ease-in-out infinite;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.join-bell:hover {
+  background: rgba(255, 107, 107, 0.3);
+  color: #fff;
+}
+@keyframes join-bell-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.55); }
+  50% { box-shadow: 0 0 0 7px rgba(255, 107, 107, 0); }
+}
+.join-bell__badge {
+  background: #ff6b6b;
+  color: #1a0d0d;
+  font-size: 11px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.join-bell__panel {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 260px;
+  background: #182233;
+  border: 1px solid #2c3f66;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  overflow: hidden;
+  animation: fade-in 0.15s ease;
+}
+.join-bell__caret {
+  position: absolute;
+  top: -6px;
+  right: 18px;
+  width: 12px;
+  height: 12px;
+  background: #182233;
+  border-left: 1px solid #2c3f66;
+  border-top: 1px solid #2c3f66;
+  transform: rotate(45deg);
+}
+.join-bell__header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #a9b8d4;
+  padding: 12px 14px 8px;
+}
+.join-bell__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid #2c3f66;
+}
+.join-bell__avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+}
+.join-bell__name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e7edf7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.join-bell__actions {
+  display: flex;
+  gap: 6px;
+}
+.join-bell__approve,
+.join-bell__deny {
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.15s ease;
+}
+.join-bell__approve {
+  background: #3ddc97;
+  color: #0b1526;
+}
+.join-bell__deny {
+  background: #ff6b6b;
+  color: #1a0d0d;
+}
+.join-bell__approve:hover,
+.join-bell__deny:hover {
+  filter: brightness(1.1);
+}
+.join-bell__approve:active,
+.join-bell__deny:active {
+  transform: translateY(1px);
+}

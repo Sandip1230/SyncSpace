@@ -17,6 +17,7 @@ const replayRouter = require("./routes/replay");
 
 const PORT = process.env.PORT || 5000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "*";
+const joinRequestHandler = require("./sockets/joinRequestHandler");
 
 const app = express();
 app.use(cors({ origin: FRONTEND_ORIGIN }));
@@ -37,6 +38,7 @@ io.on("connection", (socket) => {
   roomHandler(io, socket);
   yjsHandler(io, socket);
   pingHandler(io, socket);
+  joinRequestHandler(io, socket);
 });
 
 connectDB().then(() => {

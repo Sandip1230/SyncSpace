@@ -19,7 +19,16 @@ function Workspace() {
   const { roomId } = useParams();
   const [username] = useState(getStoredUsername() || randomGuestName());
 
-  const { connecting, users, error } = useSocket(roomId, username);
+  const {
+    connecting,
+    users,
+    error,
+    joinStatus,
+    isAdmin,
+    pendingRequests,
+    approveJoin,
+    denyJoin,
+  } = useSocket(roomId, username);
   const { ydoc, fileTreeMap, yshapes, ychat, undoManager, awareness, synced } = useYDoc(roomId, username);
   const fileSystem = useFileSystem(ydoc, fileTreeMap, synced);
 
@@ -45,14 +54,33 @@ function Workspace() {
     };
   }, [undoManager]);
 
+  if (joinStatus === "pending" || joinStatus === "idle") {
+    return (
+      <div className="waiting-approval">
+        <div className="waiting-approval__spinner" />
+        <p>Waiting for the admin to let you in…</p>
+      </div>
+    );
+  }
+  if (joinStatus === "denied") {
+    return (
+      <div className="waiting-approval waiting-approval--denied">
+        <p>The admin denied your request to join this room.</p>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* 1. Added onOpenReplay prop here: */}
       <Navbar
         roomId={roomId}
         mode={mode}
         onModeChange={setMode}
         onOpenReplay={() => setReplayOpen(true)}
+        isAdmin={isAdmin}
+        pendingRequests={pendingRequests}
+        onApproveJoin={approveJoin}
+        onDenyJoin={denyJoin}
       />
 
       {connecting ? (
@@ -65,19 +93,10 @@ function Workspace() {
         </div>
       ) : (
         <div className={`workspace-stage stage--${mode}`}>
-          <WorkspaceSidebar
-            roomId={roomId}
-            users={users}
-            connected={!connecting}
-            fileSystem={fileSystem}
-          />
+          <WorkspaceSidebar roomId={roomId} users={users} connected={!connecting} fileSystem={fileSystem} />
 
           <div className="workspace-panel workspace-panel--editor">
-            <CodeEditor
-              ydoc={ydoc}
-              fileSystem={fileSystem}
-              awareness={awareness}
-            />
+            <CodeEditor ydoc={ydoc} fileSystem={fileSystem} awareness={awareness} />
           </div>
 
           <div className="workspace-panel workspace-panel--whiteboard">
@@ -95,23 +114,12 @@ function Workspace() {
               onClear={() => clearShapes(yshapes)}
               onClose={() => setMode("editor")}
             />
-            <Whiteboard
-              yshapes={yshapes}
-              tool={tool}
-              color={color}
-              strokeWidth={strokeWidth}
-            />
+            <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} />
           </div>
         </div>
       )}
 
-      {/* 2. Added conditional rendering near the bottom of the fragment: */}
-      {replayOpen && (
-        <ReplayPanel
-          roomId={roomId}
-          onClose={() => setReplayOpen(false)}
-        />
-      )}
+      {replayOpen && <ReplayPanel roomId={roomId} onClose={() => setReplayOpen(false)} />}
 
       {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}
 
