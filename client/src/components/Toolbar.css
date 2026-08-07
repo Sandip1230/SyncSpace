@@ -8,7 +8,7 @@
   color: #e7edf7;
   flex-wrap: nowrap;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 .wb-toolbar__group {
