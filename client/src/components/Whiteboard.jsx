@@ -2,6 +2,7 @@ import { Stage, Layer, Line, Rect, Ellipse, Arrow, Text } from "react-konva";
 import { useEffect, useRef, useState } from "react";
 import { addShape, updateLastShape, updateShapeById, eraseAtPoint } from "../lib/yShapes";
 import { detectShape } from "../lib/shapeDetect";
+import "./Whiteboard.css";
 
 const FREEHAND_TOOLS = ["pen"];
 const BOX_TOOLS = ["rect", "ellipse"];
@@ -24,6 +25,7 @@ function genId() {
 function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape }) {
   const containerRef = useRef(null);
   const activeStrokeId = useRef(null);
+  const textareaRef = useRef(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [shapes, setShapes] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -53,6 +55,14 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
   useEffect(() => {
     setSelectedId(null);
   }, [tool]);
+
+  useEffect(() => {
+  if (!editingText || !textareaRef.current) return undefined;
+  const raf = requestAnimationFrame(() => textareaRef.current?.focus());
+  return () => cancelAnimationFrame(raf);
+  // only re-run when a *new* text box opens, not on every keystroke
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [editingText?.x, editingText?.y]);
 
   const commitTextEdit = () => {
     const value = editingText?.value.trim();
@@ -175,6 +185,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
   return (
     <div
       ref={containerRef}
+      className="wb-canvas-surface"
       style={{ width: "100%", height: "100%", position: "relative", cursor: CURSOR_BY_TOOL[tool] || "default" }}
     >
       <Stage width={size.width} height={size.height} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
@@ -235,36 +246,36 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
       </Stage>
 
       {editingText && (
-        <textarea
-          autoFocus
-          value={editingText.value}
-          onChange={(e) => setEditingText({ ...editingText, value: e.target.value })}
-          onBlur={commitTextEdit}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              commitTextEdit();
-            } else if (e.key === "Escape") {
-              setEditingText(null);
-              onToolChange?.("select");
-            }
-          }}
-          style={{
-            position: "absolute",
-            left: editingText.x,
-            top: editingText.y,
-            fontSize: 18,
-            color,
-            background: "transparent",
-            border: "1px dashed #3fc6d6",
-            outline: "none",
-            resize: "none",
-            minWidth: 120,
-            minHeight: 28,
-            zIndex: 30,
-          }}
-        />
-      )}
+  <textarea
+    ref={textareaRef}
+    value={editingText.value}
+    onChange={(e) => setEditingText({ ...editingText, value: e.target.value })}
+    onBlur={commitTextEdit}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        commitTextEdit();
+      } else if (e.key === "Escape") {
+        setEditingText(null);
+        onToolChange?.("select");
+      }
+    }}
+    style={{
+      position: "absolute",
+      left: editingText.x,
+      top: editingText.y,
+      fontSize: 18,
+      color,
+      background: "transparent",
+      border: "1px dashed #3fc6d6",
+      outline: "none",
+      resize: "none",
+      minWidth: 120,
+      minHeight: 28,
+      zIndex: 30,
+    }}
+  />
+)}
     </div>
   );
 }
