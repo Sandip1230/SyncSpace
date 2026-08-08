@@ -1,5 +1,6 @@
 import { useAwareness } from "../hooks/useAwareness";
 import { useState } from "react";
+import { useSettings } from "../context/SettingsContext";
 import "./Sidebar.css";
 
 function stringToColor(str) {
@@ -12,6 +13,7 @@ function Sidebar({ roomId, users = [], connected, awareness }) {
   const awarenessStates = useAwareness(awareness);
   const activityByName = Object.fromEntries(awarenessStates.map((s) => [s.name, s.activity]));
   const [copied, setCopied] = useState(false);
+  const { settings } = useSettings();
 
   const copyRoomId = () => {
     navigator.clipboard?.writeText(roomId);
@@ -42,19 +44,23 @@ function Sidebar({ roomId, users = [], connected, awareness }) {
         </div>
       </div>
 
-      <div className="sidebar__section-label">Online ({users.length})</div>
-      {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
-      <div className="sidebar__users">
-        {users.map((u) => (
-          <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
-            <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
-              {(u.username || "?").slice(0, 1).toUpperCase()}
-            </span>
-            <span className="sidebar__username">{u.username}</span>
-            {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
+      {settings.showOnlineUsers && (
+        <>
+          <div className="sidebar__section-label">Online ({users.length})</div>
+          {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
+          <div className="sidebar__users">
+            {users.map((u) => (
+              <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
+                <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
+                  {(u.username || "?").slice(0, 1).toUpperCase()}
+                </span>
+                <span className="sidebar__username">{u.username}</span>
+                {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 }

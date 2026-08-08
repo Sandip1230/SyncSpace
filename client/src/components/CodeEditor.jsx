@@ -4,10 +4,12 @@ import { MonacoBinding } from "y-monaco";
 import { FileIcon } from "./FileExplorer";
 import Terminal from "./Terminal";
 import { isRunnable } from "../lib/fileTree";
+import { useSettings, FONT_FAMILY_STACKS } from "../context/SettingsContext";
 import "./CodeEditor.css";
 
 function CodeEditor({ fileSystem, awareness }) {
   const { activeFile, activeFileId, activeText } = fileSystem;
+  const { settings } = useSettings();
 
   const bindingRef = useRef(null);
 
@@ -17,42 +19,8 @@ function CodeEditor({ fileSystem, awareness }) {
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [runRequest, setRunRequest] = useState(null);
 
-  const [editorSettings, setEditorSettings] = useState({
-    fontSize: 14,
-    fontFamily: "Monospace",
-    wordWrap: "off",
-    minimap: true,
-    lineNumbers: true,
-  });
-
   const language = activeFile?.language || "plaintext";
   const runnable = isRunnable(language);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("syncspace-settings");
-
-    if (saved) {
-      try {
-        const settings = JSON.parse(saved);
-
-        setEditorSettings({
-          fontSize: settings.fontSize || 14,
-          fontFamily: settings.fontFamily || "Monospace",
-          wordWrap: settings.wordWrap || "off",
-          minimap:
-            settings.minimap !== undefined
-              ? settings.minimap
-              : true,
-          lineNumbers:
-            settings.lineNumbers !== undefined
-              ? settings.lineNumbers
-              : true,
-        });
-      } catch (err) {
-        console.error("Failed to load editor settings", err);
-      }
-    }
-  }, []);
 
   const handleMount = (editor, monaco) => {
     setEditorInstance(editor);
@@ -172,15 +140,13 @@ function CodeEditor({ fileSystem, awareness }) {
             onMount={handleMount}
             options={{
               automaticLayout: true,
-              fontSize: editorSettings.fontSize,
-              fontFamily: editorSettings.fontFamily,
-              wordWrap: editorSettings.wordWrap,
+              fontSize: settings.fontSize,
+              fontFamily: FONT_FAMILY_STACKS[settings.fontFamily],
+              wordWrap: settings.wordWrap ? "on" : "off",
               minimap: {
-                enabled: editorSettings.minimap,
+                enabled: settings.minimap,
               },
-              lineNumbers: editorSettings.lineNumbers
-                ? "on"
-                : "off",
+              lineNumbers: settings.lineNumbers ? "on" : "off",
               smoothScrolling: true,
               padding: {
                 top: 12,

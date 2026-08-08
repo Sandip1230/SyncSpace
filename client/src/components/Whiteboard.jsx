@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { addShape, updateLastShape, updateShapeById, eraseAtPoint } from "../lib/yShapes";
 import { detectShape } from "../lib/shapeDetect";
 import "./Whiteboard.css";
+import { useSettings } from "../context/SettingsContext";
 
 const FREEHAND_TOOLS = ["pen"];
 const BOX_TOOLS = ["rect", "ellipse", "triangle", "diamond"];
@@ -35,6 +36,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
   const [startPoint, setStartPoint] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [editingText, setEditingText] = useState(null);
+  const { settings } = useSettings();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -190,7 +192,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
   return (
     <div
       ref={containerRef}
-      className="wb-canvas-surface"
+      className={`wb-canvas-surface ${settings.showGrid ? "" : "wb-canvas-surface--no-grid"}`}
       style={{ width: "100%", height: "100%", position: "relative", cursor: CURSOR_BY_TOOL[tool] || "default" }}
     >
       <Stage width={size.width} height={size.height} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>

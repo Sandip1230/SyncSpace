@@ -7,3 +7,6 @@
   background-size: 22px 22px;
   background-position: -1px -1px;
 }
+.wb-canvas-surface--no-grid {
+  background-image: none;
+}
