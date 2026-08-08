@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import "./Toolbar.css";
 
 const TOOLS = [
@@ -27,88 +27,34 @@ function Icon({ name }) {
   const props = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none" };
   switch (name) {
     case "cursor":
-      return (
-        <svg {...props}>
-          <path d="M5 3l14 7-6 2-2 6-6-15z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-        </svg>
-      );
+      return <svg {...props}><path d="M5 3l14 7-6 2-2 6-6-15z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>;
     case "pen":
-      return (
-        <svg {...props}>
-          <path
-            d="M12 20h9M3 20l1-4L16.5 3.5a2.1 2.1 0 013 3L7 18l-4 2z"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
+      return <svg {...props}><path d="M12 20h9M3 20l1-4L16.5 3.5a2.1 2.1 0 013 3L7 18l-4 2z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
     case "rect":
-      return (
-        <svg {...props}>
-          <rect x="4" y="6" width="16" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
-        </svg>
-      );
+      return <svg {...props}><rect x="4" y="6" width="16" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.8" /></svg>;
     case "ellipse":
-      return (
-        <svg {...props}>
-          <ellipse cx="12" cy="12" rx="8" ry="6" stroke="currentColor" strokeWidth="1.8" />
-        </svg>
-      );
+      return <svg {...props}><ellipse cx="12" cy="12" rx="8" ry="6" stroke="currentColor" strokeWidth="1.8" /></svg>;
     case "arrow":
-      return (
-        <svg {...props}>
-          <path d="M5 19L19 5M19 5H10M19 5v9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <svg {...props}><path d="M5 19L19 5M19 5H10M19 5v9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
     case "text":
-      return (
-        <svg {...props}>
-          <path d="M5 6h14M12 6v13M9 19h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      );
+      return <svg {...props}><path d="M5 6h14M12 6v13M9 19h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
     case "eraser":
+      return <svg {...props}><path d="M18 13l-7 7H7l-4-4a2 2 0 010-2.8l9-9a2 2 0 012.8 0l3.2 3.2a2 2 0 010 2.8L13 15" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>;
+    case "wand":
       return (
         <svg {...props}>
-          <path
-            d="M18 13l-7 7H7l-4-4a2 2 0 010-2.8l9-9a2 2 0 012.8 0l3.2 3.2a2 2 0 010 2.8L13 15"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-          />
+          <path d="M4 20L20 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M15 4l1.5 1.5M19 8l1.5 1.5M4 15l1.5 1.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
       );
     case "undo":
-      return (
-        <svg {...props}>
-          <path d="M9 7L4 12l5 5M4 12h11a5 5 0 010 10h-1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <svg {...props}><path d="M9 7L4 12l5 5M4 12h11a5 5 0 010 10h-1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
     case "redo":
-      return (
-        <svg {...props}>
-          <path d="M15 7l5 5-5 5M20 12H9a5 5 0 000 10h1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <svg {...props}><path d="M15 7l5 5-5 5M20 12H9a5 5 0 000 10h1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
     case "trash":
-      return (
-        <svg {...props}>
-          <path
-            d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      );
+      return <svg {...props}><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
     case "close":
-      return (
-        <svg {...props}>
-          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      );
+      return <svg {...props}><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
     default:
       return null;
   }
@@ -121,7 +67,7 @@ function ColorPopover({ color, onColorChange, anchorRef, onClose }) {
   useEffect(() => {
     if (anchorRef.current) {
       const r = anchorRef.current.getBoundingClientRect();
-      setPos({ top: r.bottom + 8, left: r.left });
+      setPos({ top: r.bottom + 10, left: r.left });
     }
   }, [anchorRef]);
 
@@ -136,11 +82,7 @@ function ColorPopover({ color, onColorChange, anchorRef, onClose }) {
   }, [anchorRef, onClose]);
 
   return (
-    <div
-      ref={popRef}
-      className="wb-color-popover"
-      style={{ position: "fixed", top: pos.top, left: pos.left }}
-    >
+    <div ref={popRef} className="wb-color-popover" style={{ position: "fixed", top: pos.top, left: pos.left }}>
       <div className="wb-color-popover__grid">
         {PALETTE.map((c) => (
           <button
@@ -176,6 +118,8 @@ export default function Toolbar({
   onColorChange,
   strokeWidth,
   onStrokeWidthChange,
+  autoShape,
+  onAutoShapeChange,
   onUndo,
   onRedo,
   canUndo = true,
@@ -186,12 +130,44 @@ export default function Toolbar({
   const [paletteOpen, setPaletteOpen] = useState(false);
   const customSwatchRef = useRef(null);
 
+  // sliding gradient indicator behind the active tool
+  const toolRefs = useRef({});
+  const toolGroupRef = useRef(null);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, ready: false });
+
+  const measureIndicator = () => {
+    const btn = toolRefs.current[tool];
+    const group = toolGroupRef.current;
+    if (btn && group) {
+      const gRect = group.getBoundingClientRect();
+      const bRect = btn.getBoundingClientRect();
+      setIndicator({ left: bRect.left - gRect.left, width: bRect.width, ready: true });
+    }
+  };
+
+  useLayoutEffect(measureIndicator, [tool]);
+
+  useEffect(() => {
+    window.addEventListener("resize", measureIndicator);
+    return () => window.removeEventListener("resize", measureIndicator);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tool]);
+
   return (
     <aside className="wb-toolbar">
-      <div className="wb-toolbar__group">
+      <div className="wb-toolbar__group wb-toolbar__tools" ref={toolGroupRef}>
+        <span
+          className="wb-tool-indicator"
+          style={{
+            left: `${indicator.left}px`,
+            width: `${indicator.width}px`,
+            opacity: indicator.ready ? 1 : 0,
+          }}
+        />
         {TOOLS.map((t) => (
           <button
             key={t.id}
+            ref={(el) => (toolRefs.current[t.id] = el)}
             className={`wb-tool ${tool === t.id ? "is-active" : ""}`}
             title={t.label}
             aria-label={t.label}
@@ -201,6 +177,19 @@ export default function Toolbar({
             <Icon name={t.icon} />
           </button>
         ))}
+      </div>
+<div className="wb-toolbar__divider" />
+
+      <div className="wb-toolbar__group">
+        <button
+          className={`wb-tool ${autoShape ? "is-active" : ""}`}
+          title="Auto-detect shapes from pen scribbles"
+          aria-label="Toggle shape auto-detection"
+          aria-pressed={autoShape}
+          onClick={() => onAutoShapeChange(!autoShape)}
+        >
+          <Icon name="wand" />
+        </button>
       </div>
 
       <div className="wb-toolbar__divider" />
@@ -217,11 +206,11 @@ export default function Toolbar({
           />
         ))}
         <button
-        ref={customSwatchRef}
-        className="wb-custom-color__trigger"
-        title="More colors"
-        aria-label="More colors"
-        onClick={() => setPaletteOpen((v) => !v)}
+          ref={customSwatchRef}
+          className="wb-custom-color__trigger"
+          title="More colors"
+          aria-label="More colors"
+          onClick={() => setPaletteOpen((v) => !v)}
         >
           +
         </button>
@@ -275,7 +264,7 @@ export default function Toolbar({
         </button>
       </div>
 
-      <div className="wb-toolbar__spacer" />
+      <div className="wb-toolbar__divider" />
 
       <button className="wb-tool wb-tool--close" title="Back to code (Esc)" aria-label="Close whiteboard" onClick={onClose}>
         <Icon name="close" />

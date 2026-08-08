@@ -1,17 +1,29 @@
 import { Stage, Layer, Line, Rect, Ellipse, Arrow, Text } from "react-konva";
 import { useEffect, useRef, useState } from "react";
 import { addShape, updateLastShape, updateShapeById, eraseAtPoint } from "../lib/yShapes";
+import { detectShape } from "../lib/shapeDetect";
 
 const FREEHAND_TOOLS = ["pen"];
 const BOX_TOOLS = ["rect", "ellipse"];
 const ERASER_RADIUS = 14;
 
+const CURSOR_BY_TOOL = {
+  select: "default",
+  text: "text",
+  eraser: "cell",
+  pen: "crosshair",
+  rect: "crosshair",
+  ellipse: "crosshair",
+  arrow: "crosshair",
+};
+
 function genId() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
+function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape }) {
   const containerRef = useRef(null);
+  const activeStrokeId = useRef(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [shapes, setShapes] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -43,13 +55,14 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
   }, [tool]);
 
   const commitTextEdit = () => {
-    if (editingText && editingText.value.trim() && yshapes) {
+    const value = editingText?.value.trim();
+    if (value && yshapes) {
       addShape(yshapes, {
         id: genId(),
         tool: "text",
         x: editingText.x,
         y: editingText.y,
-        text: editingText.value,
+        text: value,
         color,
         fontSize: 18,
         offsetX: 0,
@@ -57,12 +70,15 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
       });
     }
     setEditingText(null);
+    onToolChange?.("select");
   };
 
   const handleMouseDown = (e) => {
+    console.log("[Whiteboard] mousedown, tool =", tool);
     if (!yshapes) return;
-    const isEmptyStage = e.target === e.target.getStage();
-    const pos = e.target.getStage().getPointerPosition();
+    const stage = e.target.getStage();
+    const isEmptyStage = e.target === stage;
+    const pos = stage.getPointerPosition();
 
     if (tool === "select") {
       if (isEmptyStage) setSelectedId(null);
@@ -74,15 +90,17 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
       return;
     }
     if (tool === "text") {
-      if (!isEmptyStage) return;
+      console.log("[Whiteboard] text tool click, isEmptyStage =", isEmptyStage, "target =", e.target);
       if (editingText) commitTextEdit();
       setEditingText({ x: pos.x, y: pos.y, value: "" });
       return;
     }
 
     if (FREEHAND_TOOLS.includes(tool)) {
-      setIsDrawing(true);
-      addShape(yshapes, { id: genId(), tool, color, strokeWidth, points: [pos.x, pos.y], offsetX: 0, offsetY: 0 });
+       setIsDrawing(true);
+       const id = genId();
+       activeStrokeId.current = id;
+       addShape(yshapes, { id, tool, color, strokeWidth, points: [pos.x, pos.y], offsetX: 0, offsetY: 0 });
     } else if (BOX_TOOLS.includes(tool)) {
       setIsDrawing(true);
       setStartPoint(pos);
@@ -121,9 +139,17 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
   };
 
   const handleMouseUp = () => {
-    setIsDrawing(false);
-    setStartPoint(null);
-  };
+  if (tool === "pen" && autoShape && activeStrokeId.current && yshapes) {
+    const strokeShape = yshapes.toArray().find((s) => s.id === activeStrokeId.current);
+    if (strokeShape) {
+      const detected = detectShape(strokeShape.points || []);
+      if (detected) updateShapeById(yshapes, strokeShape.id, detected);
+    }
+  }
+  activeStrokeId.current = null;
+  setIsDrawing(false);
+  setStartPoint(null);
+};
 
   const selectableProps = (s) =>
     tool === "select"
@@ -147,7 +173,10 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
       : {};
 
   return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div
+      ref={containerRef}
+      style={{ width: "100%", height: "100%", position: "relative", cursor: CURSOR_BY_TOOL[tool] || "default" }}
+    >
       <Stage width={size.width} height={size.height} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
         <Layer>
           {shapes.map((s) => {
@@ -174,6 +203,12 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
             if (s.tool === "arrow") {
               return (
                 <Arrow key={s.id} x={s.offsetX || 0} y={s.offsetY || 0} points={s.points} stroke={stroke} fill={stroke} strokeWidth={s.strokeWidth} {...selectableProps(s)} />
+              );
+            }
+
+            if (s.tool === "line") {
+              return (
+                <Line key={s.id} x={s.offsetX || 0} y={s.offsetY || 0} points={s.points} stroke={stroke} strokeWidth={s.strokeWidth} lineCap="round" {...selectableProps(s)} />
               );
             }
             if (s.tool === "text") {
@@ -211,6 +246,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
               commitTextEdit();
             } else if (e.key === "Escape") {
               setEditingText(null);
+              onToolChange?.("select");
             }
           }}
           style={{
@@ -225,6 +261,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, awareness }) {
             resize: "none",
             minWidth: 120,
             minHeight: 28,
+            zIndex: 30,
           }}
         />
       )}

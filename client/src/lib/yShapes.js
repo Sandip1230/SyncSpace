@@ -71,8 +71,19 @@ function hitTestWholeShape(shape, x, y, radius) {
         const x2 = pts[i + 2] + ox, y2 = pts[i + 3] + oy;
         if (distToSegment(x, y, x1, y1, x2, y2) <= radius) return true;
       }
+    return false;
+    }
+
+    case "line": {
+      const pts = shape.points || [];
+      for (let i = 0; i < pts.length - 2; i += 2) {
+        const x1 = pts[i] + ox, y1 = pts[i + 1] + oy;
+        const x2 = pts[i + 2] + ox, y2 = pts[i + 3] + oy;
+        if (distToSegment(x, y, x1, y1, x2, y2) <= radius) return true;
+      }
       return false;
     }
+
     default:
       return false;
   }

@@ -151,10 +151,16 @@
 .workspace-panel--whiteboard {
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .workspace-panel--whiteboard .wb-toolbar {
+  position: static;
+  transform: none;
+  max-width: none;
+  width: 100%;
   flex-shrink: 0;
+  border-radius: 0;
 }
 
 .workspace-panel--whiteboard > *:last-child {
