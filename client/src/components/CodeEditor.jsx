@@ -147,23 +147,17 @@ function CodeEditor({ fileSystem, awareness }) {
             className="btn-run"
             onClick={handleRun}
             disabled={!runnable}
-            title={
-              runnable
-                ? "Run in-browser"
-                : "JS/TS only"
-            }
+            title={runnable ? "Run in-browser" : "JS/TS only"}
           >
-            ▶ Run
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+            Run
           </button>
 
           <button
-            className={`btn-terminal ${
-              terminalOpen ? "is-active" : ""
-            }`}
-            onClick={() =>
-              setTerminalOpen((v) => !v)
-            }
+            className={`btn-terminal ${terminalOpen ? "is-active" : ""}`}
+            onClick={() => setTerminalOpen((v) => !v)}
           >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 7l5 5-5 5M13 17h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Terminal
           </button>
         </div>
@@ -195,8 +189,18 @@ function CodeEditor({ fileSystem, awareness }) {
           />
         ) : (
           <div className="code-editor__empty">
-            Select a file from the explorer to start editing.
-          </div>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" className="code-editor__empty-icon">
+            <path d="M8 4 3 12l5 8M16 4l5 8-5 8" stroke="url(#emptyGrad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <defs>
+              <linearGradient id="emptyGrad" x1="2" y1="4" x2="22" y2="20">
+                <stop offset="0%" stopColor="#3fc6d6" />
+                <stop offset="100%" stopColor="#3ddc97" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <p className="code-editor__empty-title">No file open</p>
+          <p className="code-editor__empty-sub">Select a file from the explorer to start editing</p>
+        </div>
         )}
       </div>
 
