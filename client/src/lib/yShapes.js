@@ -51,6 +51,10 @@ function hitTestWholeShape(shape, x, y, radius) {
     case "rect":
       return x >= shape.x - radius && x <= shape.x + shape.width + radius &&
              y >= shape.y - radius && y <= shape.y + shape.height + radius;
+    case "triangle":
+    case "diamond":
+      return x >= shape.x - radius && x <= shape.x + shape.width + radius &&
+            y >= shape.y - radius && y <= shape.y + shape.height + radius;
     case "ellipse": {
       const cx = shape.x + shape.width / 2, cy = shape.y + shape.height / 2;
       const rx = shape.width / 2 + radius, ry = shape.height / 2 + radius;

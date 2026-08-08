@@ -6,6 +6,9 @@ const TOOLS = [
   { id: "pen", label: "Pen", icon: "pen" },
   { id: "rect", label: "Rectangle", icon: "rect" },
   { id: "ellipse", label: "Ellipse", icon: "ellipse" },
+  { id: "triangle", label: "Triangle", icon: "triangle" },
+  { id: "diamond", label: "Diamond", icon: "diamond" },
+  { id: "line", label: "Line", icon: "line" },
   { id: "arrow", label: "Arrow", icon: "arrow" },
   { id: "text", label: "Text", icon: "text" },
   { id: "eraser", label: "Eraser", icon: "eraser" },
@@ -36,6 +39,14 @@ function Icon({ name }) {
       return <svg {...props}><ellipse cx="12" cy="12" rx="8" ry="6" stroke="currentColor" strokeWidth="1.8" /></svg>;
     case "arrow":
       return <svg {...props}><path d="M5 19L19 5M19 5H10M19 5v9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+    case "triangle":
+      return <svg {...props}><path d="M12 4L20 19H4L12 4z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>;
+    case "diamond":
+      return <svg {...props}><path d="M12 3L21 12L12 21L3 12Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /></svg>;
+    case "line":
+      return <svg {...props}><path d="M4 20L20 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
+    case "fill":
+      return <svg {...props}><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" fill="currentColor" fillOpacity="0.35" /></svg>;
     case "text":
       return <svg {...props}><path d="M5 6h14M12 6v13M9 19h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
     case "eraser":
@@ -120,6 +131,10 @@ export default function Toolbar({
   onStrokeWidthChange,
   autoShape,
   onAutoShapeChange,
+  fillEnabled,
+  onFillToggle,
+  opacity,
+  onOpacityChange,
   onUndo,
   onRedo,
   canUndo = true,
@@ -242,6 +257,30 @@ export default function Toolbar({
       </div>
 
       <div className="wb-toolbar__divider" />
+      
+      <div className="wb-toolbar__group wb-toolbar__fill">
+        <button
+          className={`wb-tool ${fillEnabled ? "is-active" : ""}`}
+          title="Fill shapes (off = transparent/outline only)"
+          aria-label="Toggle fill"
+          aria-pressed={fillEnabled}
+          onClick={() => onFillToggle(!fillEnabled)}
+        >
+          <Icon name="fill" />
+        </button>
+        <input
+          type="range"
+          className="wb-opacity"
+          min="10"
+          max="100"
+          value={Math.round(opacity * 100)}
+          onChange={(e) => onOpacityChange(Number(e.target.value) / 100)}
+          title={`Opacity: ${Math.round(opacity * 100)}%`}
+          aria-label="Opacity"
+        />
+      </div>
+
+<div className="wb-toolbar__divider" />
 
       <div className="wb-toolbar__group">
         <button className="wb-tool" title="Undo" aria-label="Undo" onClick={onUndo} disabled={!canUndo}>

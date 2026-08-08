@@ -37,6 +37,8 @@
     const [color, setColor] = useState("#3fc6d6");
     const [strokeWidth, setStrokeWidth] = useState(4);
     const [autoShape, setAutoShape] = useState(false);
+    const [fillEnabled, setFillEnabled] = useState(false);
+    const [opacity, setOpacity] = useState(1);
     const [dismissedError, setDismissedError] = useState(false);
     const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
     const [replayOpen, setReplayOpen] = useState(false);
@@ -204,22 +206,35 @@
                   style={mode === "split" ? { flexBasis: `${100 - splitRatio}%` } : undefined}
                 >
                   <Toolbar
-                      tool={tool}
-                      onToolChange={setTool}
-                      color={color}
-                      onColorChange={setColor}
-                      strokeWidth={strokeWidth}
-                      onStrokeWidthChange={setStrokeWidth}
-                      autoShape={autoShape}
-                      onAutoShapeChange={setAutoShape}
-                      onUndo={() => undoManager.undo()}
-                      onRedo={() => undoManager.redo()}
-                      canUndo={undoState.canUndo}
-                      canRedo={undoState.canRedo}
-                      onClear={() => clearShapes(yshapes)}
-                      onClose={() => setMode("editor")}
+                    tool={tool}
+                    onToolChange={setTool}
+                    color={color}
+                    onColorChange={setColor}
+                    strokeWidth={strokeWidth}
+                    onStrokeWidthChange={setStrokeWidth}
+                    autoShape={autoShape}
+                    onAutoShapeChange={setAutoShape}
+                    fillEnabled={fillEnabled}
+                    onFillToggle={setFillEnabled}
+                    opacity={opacity}
+                    onOpacityChange={setOpacity}
+                    onUndo={() => undoManager.undo()}
+                    onRedo={() => undoManager.redo()}
+                    canUndo={undoState.canUndo}
+                    canRedo={undoState.canRedo}
+                    onClear={() => clearShapes(yshapes)}
+                    onClose={() => setMode("editor")}
                   />
-                  <Whiteboard yshapes={yshapes} tool={tool} color={color} strokeWidth={strokeWidth} onToolChange={setTool} autoShape={autoShape} />
+                  <Whiteboard
+                    yshapes={yshapes}
+                    tool={tool}
+                    color={color}
+                    strokeWidth={strokeWidth}
+                    onToolChange={setTool}
+                    autoShape={autoShape}
+                    fillEnabled={fillEnabled}
+                    opacity={opacity}
+                  />
                 </div>
               </div>
             </div>

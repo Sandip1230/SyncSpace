@@ -5,7 +5,7 @@ import { detectShape } from "../lib/shapeDetect";
 import "./Whiteboard.css";
 
 const FREEHAND_TOOLS = ["pen"];
-const BOX_TOOLS = ["rect", "ellipse"];
+const BOX_TOOLS = ["rect", "ellipse", "triangle", "diamond"];
 const ERASER_RADIUS = 14;
 
 const CURSOR_BY_TOOL = {
@@ -15,14 +15,17 @@ const CURSOR_BY_TOOL = {
   pen: "crosshair",
   rect: "crosshair",
   ellipse: "crosshair",
+  triangle: "crosshair",
+  diamond: "crosshair",
   arrow: "crosshair",
+  line: "crosshair",
 };
 
 function genId() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape }) {
+function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape, fillEnabled, opacity }) {
   const containerRef = useRef(null);
   const activeStrokeId = useRef(null);
   const textareaRef = useRef(null);
@@ -145,7 +148,9 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
       });
     } else if (last.tool === "arrow" && startPoint) {
       updateLastShape(yshapes, { points: [startPoint.x, startPoint.y, pos.x, pos.y] });
-    }
+    } else if ((last.tool === "arrow" || last.tool === "line") && startPoint) {
+      updateLastShape(yshapes, { points: [startPoint.x, startPoint.y, pos.x, pos.y] });
+    } 
   };
 
   const handleMouseUp = () => {
@@ -162,25 +167,25 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
 };
 
   const selectableProps = (s) =>
-    tool === "select"
-      ? {
-          draggable: true,
-          onClick: () => setSelectedId(s.id),
-          onTap: () => setSelectedId(s.id),
-          onDragEnd: (e) => {
-            if (s.tool === "rect" || s.tool === "text") {
-              updateShapeById(yshapes, s.id, { x: e.target.x(), y: e.target.y() });
-            } else if (s.tool === "ellipse") {
-              updateShapeById(yshapes, s.id, {
-                x: e.target.x() - s.width / 2,
-                y: e.target.y() - s.height / 2,
-              });
-            } else {
-              updateShapeById(yshapes, s.id, { offsetX: e.target.x(), offsetY: e.target.y() });
-            }
-          },
-        }
-      : {};
+  tool === "select"
+    ? {
+        draggable: true,
+        onClick: () => setSelectedId(s.id),
+        onTap: () => setSelectedId(s.id),
+        onDragEnd: (e) => {
+          if (["rect", "text", "triangle", "diamond"].includes(s.tool)) {
+            updateShapeById(yshapes, s.id, { x: e.target.x(), y: e.target.y() });
+          } else if (s.tool === "ellipse") {
+            updateShapeById(yshapes, s.id, {
+              x: e.target.x() - s.width / 2,
+              y: e.target.y() - s.height / 2,
+            });
+          } else {
+            updateShapeById(yshapes, s.id, { offsetX: e.target.x(), offsetY: e.target.y() });
+          }
+        },
+      }
+    : {};
 
   return (
     <div
@@ -194,17 +199,66 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
             const stroke = s.id === selectedId ? "#3fc6d6" : s.color;
 
             if (s.tool === "rect") {
-              return <Rect key={s.id} x={s.x} y={s.y} width={s.width} height={s.height} stroke={stroke} strokeWidth={s.strokeWidth} dash={s.id === selectedId ? [4, 4] : undefined} {...selectableProps(s)} />;
+              return (
+                <Rect
+                  key={s.id}
+                  x={s.x} y={s.y} width={s.width} height={s.height}
+                  stroke={stroke}
+                  fill={s.fill ? s.color : undefined}
+                  opacity={s.opacity ?? 1}
+                  strokeWidth={s.strokeWidth}
+                  dash={s.id === selectedId ? [4, 4] : undefined}
+                  {...selectableProps(s)}
+                />
+              );
             }
             if (s.tool === "ellipse") {
               return (
                 <Ellipse
                   key={s.id}
-                  x={s.x + s.width / 2}
-                  y={s.y + s.height / 2}
-                  radiusX={s.width / 2}
-                  radiusY={s.height / 2}
+                  x={s.x + s.width / 2} y={s.y + s.height / 2}
+                  radiusX={s.width / 2} radiusY={s.height / 2}
                   stroke={stroke}
+                  fill={s.fill ? s.color : undefined}
+                  opacity={s.opacity ?? 1}
+                  strokeWidth={s.strokeWidth}
+                  dash={s.id === selectedId ? [4, 4] : undefined}
+                  {...selectableProps(s)}
+                />
+              );
+            }
+
+            if (s.tool === "triangle") {
+              const pts = [
+                s.x + s.width / 2, s.y,
+                s.x, s.y + s.height,
+                s.x + s.width, s.y + s.height,
+              ];
+              return (
+                <Line
+                  key={s.id} points={pts} closed
+                  stroke={stroke}
+                  fill={s.fill ? s.color : undefined}
+                  opacity={s.opacity ?? 1}
+                  strokeWidth={s.strokeWidth}
+                  dash={s.id === selectedId ? [4, 4] : undefined}
+                  {...selectableProps(s)}
+                />
+              );
+            }
+            if (s.tool === "diamond") {
+              const pts = [
+                s.x + s.width / 2, s.y,
+                s.x + s.width, s.y + s.height / 2,
+                s.x + s.width / 2, s.y + s.height,
+                s.x, s.y + s.height / 2,
+              ];
+              return (
+                <Line
+                  key={s.id} points={pts} closed
+                  stroke={stroke}
+                  fill={s.fill ? s.color : undefined}
+                  opacity={s.opacity ?? 1}
                   strokeWidth={s.strokeWidth}
                   dash={s.id === selectedId ? [4, 4] : undefined}
                   {...selectableProps(s)}
@@ -213,13 +267,12 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
             }
             if (s.tool === "arrow") {
               return (
-                <Arrow key={s.id} x={s.offsetX || 0} y={s.offsetY || 0} points={s.points} stroke={stroke} fill={stroke} strokeWidth={s.strokeWidth} {...selectableProps(s)} />
+                <Arrow key={s.id} x={s.offsetX || 0} y={s.offsetY || 0} points={s.points} stroke={stroke} fill={stroke} opacity={s.opacity ?? 1} strokeWidth={s.strokeWidth} {...selectableProps(s)} />
               );
             }
-
             if (s.tool === "line") {
               return (
-                <Line key={s.id} x={s.offsetX || 0} y={s.offsetY || 0} points={s.points} stroke={stroke} strokeWidth={s.strokeWidth} lineCap="round" {...selectableProps(s)} />
+                <Line key={s.id} x={s.offsetX || 0} y={s.offsetY || 0} points={s.points} stroke={stroke} opacity={s.opacity ?? 1} strokeWidth={s.strokeWidth} lineCap="round" {...selectableProps(s)} />
               );
             }
             if (s.tool === "text") {
