@@ -27,6 +27,23 @@ function roomHandler(io, socket) {
   });
 
   socket.on("room:leave", () => leaveCurrentRoom(io, socket));
+  socket.on("room:kick", ({ roomId, targetSocketId }) => {
+    const room = getRoom(roomId);
+    if (!room) return;
+
+    // only the current admin may kick, and never themselves
+    if (room.adminSocketId !== socket.id || targetSocketId === socket.id) return;
+
+    const targetSocket = io.sockets.sockets.get(targetSocketId);
+    if (!targetSocket) return;
+
+    room.users.delete(targetSocketId);
+    targetSocket.emit("room:kicked");
+    targetSocket.leave(roomId);
+    targetSocket.data.roomId = null;
+
+    io.to(roomId).emit("room:users", listUsers(roomId));
+  });
   socket.on("disconnect", () => leaveCurrentRoom(io, socket));
 }
 

@@ -7,22 +7,24 @@
   box-sizing: border-box;
   background: var(--bg-primary);
   border-right: 1px solid var(--border-subtle);
+  overflow: hidden;
 }
 
 .workspace-sidebar__pane {
   overflow: hidden;
+  min-height: 0;
 }
 
 .workspace-sidebar__pane--room {
-  flex: 0 1 auto;
-  max-height: 50%;
+  flex: 0 0 auto;
+  max-height: 42vh;
   min-height: 0;
   display: flex;
 }
 
 .workspace-sidebar__pane--explorer {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 120px;
   display: flex;
   background: var(--bg-panel);
   border: 1px solid var(--border-subtle);

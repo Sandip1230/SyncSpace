@@ -875,3 +875,105 @@
 
 .confirm-card__cancel:active,
 .confirm-card__confirm:active { transform: scale(0.97); }
+
+.people-btn-wrap {
+  position: relative;
+}
+
+.people-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 10px;
+  background: #2c3f66;
+  color: #a9b8d4;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+.people-btn:hover {
+  background: #3a4f7a;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.people-btn__count {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 14px;
+  text-align: center;
+}
+
+.people-panel {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  width: 240px;
+  box-sizing: border-box;
+  background-color: #182233;
+  border: 1px solid #2c3f66;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  overflow: hidden;
+  animation: fade-in 0.15s ease;
+}
+
+.people-panel__header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #a9b8d4;
+  padding: 12px 14px 8px;
+}
+
+.people-panel__list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.people-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 1px solid #2c3f66;
+}
+
+.people-panel__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.people-panel__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e7edf7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.people-panel__admin {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #3fc6d6;
+  background: rgba(63, 198, 214, 0.15);
+  padding: 2px 6px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}

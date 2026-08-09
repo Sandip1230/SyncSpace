@@ -27,6 +27,7 @@
 .sidebar__card--users {
   flex: 1 1 auto;
   min-height: 0;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -105,7 +106,14 @@
 }
 .sidebar__user:hover { background: var(--bg-primary); border-color: var(--border-subtle); transform: translateX(2px); }
 .sidebar__avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
-.sidebar__username { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar__username {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .sidebar__user--admin {
   background: rgba(63, 198, 214, 0.12);
@@ -134,3 +142,20 @@
 
 .sidebar__activity--editing { color: var(--accent); }
 .sidebar__activity--drawing { color: var(--success); }
+.sidebar__kick-btn {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity var(--duration-fast) var(--ease), background var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease);
+}
+.sidebar__user:hover .sidebar__kick-btn { opacity: 1; }
+.sidebar__kick-btn:hover { background: rgba(255, 107, 107, 0.15); color: #ff6b6b; }

@@ -1,6 +1,5 @@
-import { useAwareness } from "../hooks/useAwareness";
 import { useState } from "react";
-import { useSettings } from "../context/SettingsContext";
+import socket from "../services/socket";
 import "./Sidebar.css";
 
 function stringToColor(str) {
@@ -9,11 +8,9 @@ function stringToColor(str) {
   return `hsl(${Math.abs(hash) % 360}, 65%, 55%)`;
 }
 
-function Sidebar({ roomId, users = [], connected, awareness }) {
-  const awarenessStates = useAwareness(awareness);
-  const activityByName = Object.fromEntries(awarenessStates.map((s) => [s.name, s.activity]));
+function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
   const [copied, setCopied] = useState(false);
-  const { settings } = useSettings();
+  const [kickTarget, setKickTarget] = useState(null); // { socketId, username } | null
 
   const copyRoomId = () => {
     navigator.clipboard?.writeText(roomId);
@@ -44,22 +41,62 @@ function Sidebar({ roomId, users = [], connected, awareness }) {
         </div>
       </div>
 
-      {settings.showOnlineUsers && (
-        <>
-          <div className="sidebar__section-label">Online ({users.length})</div>
-          {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
-          <div className="sidebar__users">
-            {users.map((u) => (
-              <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
-                <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
-                  {(u.username || "?").slice(0, 1).toUpperCase()}
-                </span>
-                <span className="sidebar__username">{u.username}</span>
-                {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
-              </div>
-            ))}
+      <div className="sidebar__card sidebar__card--users">
+        <div className="sidebar__card-header">
+          <span className="sidebar__section-label">Online</span>
+          <span className="sidebar__count-badge">{users.length}</span>
+        </div>
+        {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
+        <div className="sidebar__users">
+          {users.map((u) => (
+            <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
+              <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
+                {(u.username || "?").slice(0, 1).toUpperCase()}
+              </span>
+              <span className="sidebar__username">{u.username}</span>
+              {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
+              {isAdmin && !u.isAdmin && u.socketId !== socket.id && (
+                <button
+                  className="sidebar__kick-btn"
+                  title={`Remove ${u.username}`}
+                  aria-label={`Remove ${u.username}`}
+                  onClick={() => setKickTarget(u)}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {kickTarget && (
+        <div className="confirm-overlay">
+          <div className="confirm-card">
+            <div className="confirm-card__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 9v4M12 17h.01" stroke="#ff6b6b" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="12" cy="12" r="9" stroke="#ff6b6b" strokeWidth="1.8" />
+              </svg>
+            </div>
+            <h3 className="confirm-card__title">Remove {kickTarget.username}?</h3>
+            <p className="confirm-card__body">
+              They'll be disconnected from this room immediately and can only rejoin with a new request.
+            </p>
+            <div className="confirm-card__actions">
+              <button className="confirm-card__cancel" onClick={() => setKickTarget(null)}>Cancel</button>
+              <button
+                className="confirm-card__confirm"
+                onClick={() => {
+                  onKickUser(kickTarget.socketId);
+                  setKickTarget(null);
+                }}
+              >
+                Remove
+              </button>
+            </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

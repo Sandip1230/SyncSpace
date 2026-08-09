@@ -53,6 +53,7 @@ export function useSocket(roomId, username) {
     const onUserJoined = (u) => setUsers((prev) => [...prev, u]);
     const onUserLeft = ({ socketId }) => setUsers((prev) => prev.filter((u) => u.socketId !== socketId));
     const onRoomError = ({ message }) => setError(message);
+    const onKicked = () => setJoinStatus("kicked");
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -63,6 +64,7 @@ export function useSocket(roomId, username) {
     socket.on(SOCKET_EVENTS.ROOM_USER_JOINED, onUserJoined);
     socket.on(SOCKET_EVENTS.ROOM_USER_LEFT, onUserLeft);
     socket.on("room:error", onRoomError);
+    socket.on(SOCKET_EVENTS.ROOM_KICKED, onKicked);
 
     if (socket.connected) onConnect();
 
@@ -76,6 +78,7 @@ export function useSocket(roomId, username) {
       socket.off(SOCKET_EVENTS.ROOM_USER_JOINED, onUserJoined);
       socket.off(SOCKET_EVENTS.ROOM_USER_LEFT, onUserLeft);
       socket.off("room:error", onRoomError);
+      socket.off(SOCKET_EVENTS.ROOM_KICKED, onKicked);
       if (joinedRoomRef.current) {
         socket.emit(SOCKET_EVENTS.ROOM_LEAVE);
         joinedRoomRef.current = null;
@@ -92,5 +95,8 @@ export function useSocket(roomId, username) {
     setPendingRequests((prev) => prev.filter((r) => r.requesterId !== requesterId));
   };
 
-  return { socket, connected, connecting, users, error, joinStatus, isAdmin, pendingRequests, approveJoin, denyJoin };
-}
+  const kickUser = (targetSocketId) => {
+  socket.emit(SOCKET_EVENTS.ROOM_KICK, { roomId, targetSocketId });
+};
+
+return { socket, connected, connecting, users, error, joinStatus, isAdmin, pendingRequests, approveJoin, denyJoin, kickUser };}

@@ -12,8 +12,6 @@ export const SOCKET_EVENTS = {
   YJS_SYNC: "yjs:sync",
   YJS_UPDATE: "yjs:update",
   AWARENESS_UPDATE: "awareness:update",
-  CHAT_TYPING: "chat:typing",
-
 
   ROOM_REQUEST_JOIN: "room:request-join",
   ROOM_JOIN_APPROVED: "room:join-approved",
@@ -21,4 +19,7 @@ export const SOCKET_EVENTS = {
   ROOM_INCOMING_JOIN_REQUEST: "room:incoming-join-request",
   ROOM_APPROVE_JOIN: "room:approve-join",
   ROOM_DENY_JOIN: "room:deny-join",
+
+  ROOM_KICK: "room:kick",
+  ROOM_KICKED: "room:kicked",
 };
