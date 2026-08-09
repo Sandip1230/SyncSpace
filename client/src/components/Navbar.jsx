@@ -33,10 +33,15 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequ
   const modeRefs = useRef({});
   const [indicatorRect, setIndicatorRect] = useState({ left: 3, width: 0 });
 
+  const handleLeaveRoom = () => setShowLeaveConfirm(true);
+  const confirmLeaveRoom = () => navigate("/home");
+
   const measureIndicator = () => {
     const btn = modeRefs.current[mode];
     if (btn) setIndicatorRect({ left: btn.offsetLeft, width: btn.offsetWidth });
   };
+
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   useLayoutEffect(measureIndicator, [mode]);
   useEffect(() => {
@@ -89,27 +94,26 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequ
 
           <div className="navbar__divider" />
 
-          <div className="navbar__group">
-            <button className="navbar__chip" onClick={() => navigate("/create")}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-              Create
-            </button>
-            <button className="navbar__chip" onClick={() => navigate("/join")}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M11 16l-4-4 4-4M7 12h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              Join
-            </button>
-            {roomId && onOpenReplay && (
+          {roomId && onOpenReplay && (
+            <div className="navbar__group">
               <button className="navbar__chip" onClick={onOpenReplay}>
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M3 12a9 9 0 103-6.7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><path d="M3 12V6m0 6h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 Replay
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {roomId && (
             <button className="navbar__btn navbar__btn--accent" onClick={handleShare}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4-4 4M12 2v14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
               Share
+            </button>
+          )}
+
+          {roomId && (
+            <button className="navbar__btn navbar__btn--danger" onClick={handleLeaveRoom}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              Leave
             </button>
           )}
         </div>
@@ -138,6 +142,31 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequ
           </div>
         </div>
       )}
+
+      {showLeaveConfirm && (
+      <div className="confirm-overlay">
+        <div className="confirm-card">
+          <div className="confirm-card__icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v4M12 17h.01" stroke="#ff6b6b" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="12" cy="12" r="9" stroke="#ff6b6b" strokeWidth="1.8" />
+            </svg>
+          </div>
+          <h3 className="confirm-card__title">Leave this room?</h3>
+          <p className="confirm-card__body">
+            You can rejoin anytime with the room ID. Anyone still inside will keep working uninterrupted.
+          </p>
+          <div className="confirm-card__actions">
+            <button className="confirm-card__cancel" onClick={() => setShowLeaveConfirm(false)}>
+              Cancel
+            </button>
+            <button className="confirm-card__confirm" onClick={confirmLeaveRoom}>
+              Leave Room
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
