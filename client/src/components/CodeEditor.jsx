@@ -48,6 +48,8 @@ function CodeEditor({ fileSystem, awareness }) {
       new Set([editorInstance]),
       awareness
     );
+    editorInstance.setPosition({ lineNumber: 1, column: 1 });
+    editorInstance.revealLine(1);
 
     return () => bindingRef.current?.destroy();
 
@@ -134,7 +136,6 @@ function CodeEditor({ fileSystem, awareness }) {
       <div className="code-editor__surface">
         {activeText ? (
           <Editor
-            key={activeFileId}
             language={language}
             theme="vs-dark"
             onMount={handleMount}
