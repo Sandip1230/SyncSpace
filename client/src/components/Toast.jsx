@@ -1,12 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import "./Toast.css";
 
 function Toast({ message, tone = "error", onDismiss, duration = 4000 }) {
+  // keep the latest onDismiss without making the timer effect depend on it -
+  // onDismiss is a new function reference on every parent render, which was
+  // resetting the auto-dismiss timer far more often than intended
+  const onDismissRef = useRef(onDismiss);
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  }, [onDismiss]);
+
   useEffect(() => {
     if (!message) return undefined;
-    const t = setTimeout(onDismiss, duration);
+    const t = setTimeout(() => onDismissRef.current?.(), duration);
     return () => clearTimeout(t);
-  }, [message, duration, onDismiss]);
+  }, [message, duration]);
 
   if (!message) return null;
 
