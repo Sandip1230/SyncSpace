@@ -4,6 +4,7 @@ import { addShape, updateLastShape, updateShapeById, eraseAtPoint } from "../lib
 import { detectShape } from "../lib/shapeDetect";
 import "./Whiteboard.css";
 import { useSettings } from "../context/SettingsContext";
+import { useAwareness } from "../hooks/useAwareness";
 
 const FREEHAND_TOOLS = ["pen"];
 const BOX_TOOLS = ["rect", "ellipse", "triangle", "diamond"];
@@ -26,10 +27,12 @@ function genId() {
   return `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape, fillEnabled, opacity }) {
+function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape, fillEnabled, opacity, awareness, ydoc }) {
   const containerRef = useRef(null);
   const activeStrokeId = useRef(null);
   const textareaRef = useRef(null);
+  const cursorPosRef = useRef(null);
+  const cursorRafPending = useRef(false);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [shapes, setShapes] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -37,6 +40,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
   const [selectedId, setSelectedId] = useState(null);
   const [editingText, setEditingText] = useState(null);
   const { settings } = useSettings();
+  const remoteUsers = useAwareness(awareness).filter((u) => u.clientId !== ydoc?.clientID && u.cursor);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -127,9 +131,26 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
     }
   };
 
+  const broadcastCursor = (pos) => {
+    if (!awareness || !pos) return;
+    cursorPosRef.current = { x: pos.x, y: pos.y };
+    if (cursorRafPending.current) return;
+    cursorRafPending.current = true;
+    requestAnimationFrame(() => {
+      cursorRafPending.current = false;
+      if (cursorPosRef.current) awareness.setLocalStateField("cursor", cursorPosRef.current);
+    });
+  };
+
+  const handleMouseLeave = () => {
+    awareness?.setLocalStateField("cursor", null);
+  };
+
   const handleMouseMove = (e) => {
-    if (!isDrawing || !yshapes) return;
     const pos = e.target.getStage().getPointerPosition();
+    broadcastCursor(pos);
+
+    if (!isDrawing || !yshapes) return;
 
     if (tool === "eraser") {
       eraseAtPoint(yshapes, pos.x, pos.y, ERASER_RADIUS);
@@ -192,6 +213,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
       ref={containerRef}
       className={`wb-canvas-surface ${settings.showGrid ? "" : "wb-canvas-surface--no-grid"}`}
       style={{ width: "100%", height: "100%", position: "relative", cursor: CURSOR_BY_TOOL[tool] || "default" }}
+      onMouseLeave={handleMouseLeave}
     >
       <Stage width={size.width} height={size.height} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
         <Layer>
@@ -297,6 +319,19 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
           })}
         </Layer>
       </Stage>
+
+      {remoteUsers.map((u) => (
+        <div
+          key={u.clientId}
+          className="wb-remote-cursor"
+          style={{ left: u.cursor.x, top: u.cursor.y }}
+        >
+          <span className="wb-remote-cursor__dot" style={{ background: u.color }} />
+          <span className="wb-remote-cursor__label" style={{ background: u.color }}>
+            {u.name}
+          </span>
+        </div>
+      ))}
 
       {editingText && (
   <textarea

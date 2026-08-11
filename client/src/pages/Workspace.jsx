@@ -6,6 +6,7 @@ import Whiteboard from "../components/Whiteboard";
 import CodeEditor from "../components/CodeEditor";
 import Toast from "../components/Toast";
 import ChatPanel from "../components/ChatPanel";
+import Settings from "./Settings";
 import { useSocket } from "../hooks/useSocket";
 import { useYDoc } from "../hooks/useYDoc";
 import { useFileSystem } from "../hooks/useFileSystem";
@@ -43,6 +44,7 @@ function Workspace() {
   const [dismissedError, setDismissedError] = useState(false);
   const [undoState, setUndoState] = useState({ canUndo: false, canRedo: false });
   const [replayOpen, setReplayOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const splitAreaRef = useRef(null);
   const [splitRatio, setSplitRatio] = useState(50); // % width given to the editor panel
@@ -169,6 +171,7 @@ function Workspace() {
         mode={mode}
         onModeChange={setMode}
         onOpenReplay={() => setReplayOpen(true)}
+        onOpenSettings={() => setSettingsOpen(true)}
         isAdmin={isAdmin}
         pendingRequests={pendingRequests}
         onApproveJoin={approveJoin}
@@ -250,6 +253,8 @@ function Workspace() {
                 autoShape={autoShape}
                 fillEnabled={fillEnabled}
                 opacity={opacity}
+                awareness={awareness}
+                ydoc={ydoc}
               />
             </div>
           </div>
@@ -257,6 +262,8 @@ function Workspace() {
       )}
 
       {replayOpen && <ReplayPanel roomId={roomId} onClose={() => setReplayOpen(false)} />}
+
+      {settingsOpen && <Settings onClose={() => setSettingsOpen(false)} />}
 
       {!dismissedError && <Toast message={error} tone="error" onDismiss={() => setDismissedError(true)} />}
 

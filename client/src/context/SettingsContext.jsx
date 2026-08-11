@@ -10,6 +10,7 @@ const DEFAULTS = {
   minimap: true,
   showOnlineUsers: true,
   showGrid: true,
+  cursorColor: null, // null = auto-generated from socket id/username
 };
 
 export const FONT_FAMILY_STACKS = {

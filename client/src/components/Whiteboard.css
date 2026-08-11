@@ -10,3 +10,32 @@
 .wb-canvas-surface--no-grid {
   background-image: none;
 }
+
+.wb-remote-cursor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 25;
+}
+.wb-remote-cursor__dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+.wb-remote-cursor__label {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}

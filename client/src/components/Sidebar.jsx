@@ -1,16 +1,13 @@
 import { useState } from "react";
 import socket from "../services/socket";
+import { resolveUserColor } from "../utils/color";
+import { useSettings } from "../context/SettingsContext";
 import "./Sidebar.css";
-
-function stringToColor(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return `hsl(${Math.abs(hash) % 360}, 65%, 55%)`;
-}
 
 function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
   const [copied, setCopied] = useState(false);
   const [kickTarget, setKickTarget] = useState(null); // { socketId, username } | null
+  const { settings } = useSettings();
 
   const copyRoomId = () => {
     navigator.clipboard?.writeText(roomId);
@@ -41,34 +38,39 @@ function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
         </div>
       </div>
 
-      <div className="sidebar__card sidebar__card--users">
-        <div className="sidebar__card-header">
-          <span className="sidebar__section-label">Online</span>
-          <span className="sidebar__count-badge">{users.length}</span>
-        </div>
-        {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
-        <div className="sidebar__users">
-          {users.map((u) => (
-            <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
-              <span className="sidebar__avatar" style={{ background: stringToColor(u.socketId) }}>
-                {(u.username || "?").slice(0, 1).toUpperCase()}
-              </span>
-              <span className="sidebar__username">{u.username}</span>
-              {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
-              {isAdmin && !u.isAdmin && u.socketId !== socket.id && (
-                <button
-                  className="sidebar__kick-btn"
-                  title={`Remove ${u.username}`}
-                  aria-label={`Remove ${u.username}`}
-                  onClick={() => setKickTarget(u)}
+      {settings.showOnlineUsers && (
+        <div className="sidebar__card sidebar__card--users">
+          <div className="sidebar__card-header">
+            <span className="sidebar__section-label">Online</span>
+            <span className="sidebar__count-badge">{users.length}</span>
+          </div>
+          {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
+          <div className="sidebar__users">
+            {users.map((u) => (
+              <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
+                <span
+                  className="sidebar__avatar"
+                  style={{ background: resolveUserColor(u.socketId, u.socketId === socket.id ? settings.cursorColor : null) }}
                 >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                </button>
-              )}
-            </div>
-          ))}
+                  {(u.username || "?").slice(0, 1).toUpperCase()}
+                </span>
+                <span className="sidebar__username">{u.username}</span>
+                {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
+                {isAdmin && !u.isAdmin && u.socketId !== socket.id && (
+                  <button
+                    className="sidebar__kick-btn"
+                    title={`Remove ${u.username}`}
+                    aria-label={`Remove ${u.username}`}
+                    onClick={() => setKickTarget(u)}
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {kickTarget && (
         <div className="confirm-overlay">

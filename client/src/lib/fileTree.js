@@ -13,7 +13,7 @@ export function languageForName(name) {
 }
 
 export function isRunnable(language) {
-  return language === "javascript" || language === "typescript";
+  return language === "javascript" || language === "typescript" || language === "python";
 }
 
 function genId(prefix) {

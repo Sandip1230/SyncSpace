@@ -10,7 +10,7 @@ export function useAwareness(awareness) {
       const list = [];
       awareness.getStates().forEach((state, clientId) => {
         if (state.user) {
-          list.push({ clientId, ...state.user, activity: state.activity || "idle" });
+          list.push({ clientId, ...state.user, activity: state.activity || "idle", cursor: state.cursor || null });
         }
       });
       setStates(list);

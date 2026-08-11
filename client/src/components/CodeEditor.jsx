@@ -5,11 +5,14 @@ import { FileIcon } from "./FileExplorer";
 import Terminal from "./Terminal";
 import { isRunnable } from "../lib/fileTree";
 import { useSettings, FONT_FAMILY_STACKS } from "../context/SettingsContext";
+import { useRemoteCursorStyles } from "../hooks/useRemoteCursorStyles";
 import "./CodeEditor.css";
 
-function CodeEditor({ fileSystem, awareness }) {
+function CodeEditor({ ydoc, fileSystem, awareness }) {
   const { activeFile, activeFileId, activeText } = fileSystem;
   const { settings } = useSettings();
+
+  useRemoteCursorStyles(awareness, ydoc?.clientID);
 
   const bindingRef = useRef(null);
 
@@ -117,7 +120,7 @@ function CodeEditor({ fileSystem, awareness }) {
             className="btn-run"
             onClick={handleRun}
             disabled={!runnable}
-            title={runnable ? "Run in-browser" : "JS/TS only"}
+            title={runnable ? "Run in-browser" : "JS/TS/Python only"}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
             Run

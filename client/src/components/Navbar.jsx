@@ -19,7 +19,7 @@ function stringToColor(str) {
   return `hsl(${Math.abs(hash) % 360}, 65%, 55%)`;
 }
 
-function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequests, onApproveJoin, onDenyJoin, users = [] }) {
+function Navbar({ roomId, mode, onModeChange, onOpenReplay, onOpenSettings, isAdmin, pendingRequests, onApproveJoin, onDenyJoin, users = [] }) {
   const navigate = useNavigate();
 
   const [copied, setCopied] = useState(false);
@@ -129,7 +129,7 @@ function Navbar({ roomId, mode, onModeChange, onOpenReplay, isAdmin, pendingRequ
           <div className="navbar__group">
             <PingIndicator />
             <ThemeToggle />
-            <button className="navbar__icon-btn" title="Settings" aria-label="Settings" onClick={() => navigate("/settings")}>
+            <button className="navbar__icon-btn" title="Settings" aria-label="Settings" onClick={() => onOpenSettings?.()}>
               <FiSettings size={15} />
             </button>
           </div>

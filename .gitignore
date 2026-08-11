@@ -141,3 +141,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Pyodide runtime assets (copied from node_modules/pyodide via postinstall)
+client/public/pyodide/

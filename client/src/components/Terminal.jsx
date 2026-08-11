@@ -51,7 +51,7 @@ function Terminal({ code, language, autoRunToken, onClose }) {
         </div>
       </div>
       <div className="terminal__body" ref={bodyRef}>
-        {lines.length === 0 && !running && <div className="terminal__hint">Press Run to execute (JavaScript/TypeScript only).</div>}
+        {lines.length === 0 && !running && <div className="terminal__hint">Press Run to execute (JavaScript, TypeScript, or Python).</div>}
         {lines.map((l) => (
           <div key={l.id} className={`terminal__line terminal__line--${l.kind}`}>{l.text}</div>
         ))}

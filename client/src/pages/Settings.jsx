@@ -1,16 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useSettings, FONT_FAMILY_STACKS } from "../context/SettingsContext";
 import ThemeToggle from "../components/ThemeToggle";
+import socket from "../services/socket";
+import { stringToColor } from "../utils/color";
 import "./Settings.css";
 
-export default function Settings() {
+export default function Settings({ onClose }) {
   const navigate = useNavigate();
   const { settings, updateSetting, resetSettings } = useSettings();
 
   return (
     <div className="settings">
       <div className="settings-card">
-        <button className="back-btn" type="button" onClick={() => navigate(-1)}>
+        <button className="back-btn" type="button" onClick={() => (onClose ? onClose() : navigate(-1))}>
           ← Back to Editor
         </button>
 
@@ -103,6 +105,27 @@ export default function Settings() {
                 <small>Display the dotted background on the whiteboard.</small>
               </span>
             </label>
+          </div>
+
+          <h2>Collaboration</h2>
+
+          <div className="settings-group settings-group--row">
+            <div>
+              <label>Cursor Color</label>
+              <small>Shown to others on your editor cursor and whiteboard pointer.</small>
+            </div>
+            <div className="cursor-color-picker">
+              <input
+                type="color"
+                value={settings.cursorColor || stringToColor(socket.id || "user")}
+                onChange={(e) => updateSetting("cursorColor", e.target.value)}
+              />
+              {settings.cursorColor && (
+                <button type="button" className="cursor-color-auto-btn" onClick={() => updateSetting("cursorColor", null)}>
+                  Auto
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="settings-actions">

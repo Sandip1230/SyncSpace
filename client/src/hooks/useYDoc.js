@@ -4,14 +4,12 @@ import * as awarenessProtocol from "y-protocols/awareness.js";
 import socket from "../services/socket";
 import { SOCKET_EVENTS } from "../utils/constants";
 import { createUndoManager } from "../lib/yShapes";
-
-function stringToColor(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  return `hsl(${Math.abs(hash) % 360}, 70%, 60%)`;
-}
+import { resolveUserColor } from "../utils/color";
+import { useSettings } from "../context/SettingsContext";
 
 export function useYDoc(roomId, username) {
+  const { settings } = useSettings();
+  const cursorColor = settings.cursorColor;
   const ydoc = useMemo(() => new Y.Doc(), [roomId]);
   const fileTreeMap = useMemo(() => ydoc.getMap("fileTree"), [ydoc]);
   const yshapes = useMemo(() => ydoc.getArray("shapes"), [ydoc]);
@@ -50,8 +48,6 @@ export function useYDoc(roomId, username) {
     ydoc.on("update", onLocalUpdate);
     awareness.on("update", onAwarenessChange);
 
-    awareness.setLocalStateField("user", { name: username || "Anonymous", color: stringToColor(socket.id || username || "user") });
-
     return () => {
       socket.off(SOCKET_EVENTS.YJS_SYNC, onSync);
       socket.off(SOCKET_EVENTS.YJS_UPDATE, onUpdate);
@@ -61,6 +57,13 @@ export function useYDoc(roomId, username) {
       awarenessProtocol.removeAwarenessStates(awareness, [ydoc.clientID], "local");
     };
   }, [ydoc, roomId, undoManager, awareness, username]);
+
+  useEffect(() => {
+    awareness.setLocalStateField("user", {
+      name: username || "Anonymous",
+      color: resolveUserColor(socket.id || username || "user", cursorColor),
+    });
+  }, [awareness, username, cursorColor]);
 
   return { ydoc, fileTreeMap, yshapes, ychat, undoManager, awareness, synced };
 }

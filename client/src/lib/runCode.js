@@ -28,7 +28,50 @@ async function transpile(code, language) {
   return result.outputText;
 }
 
+let pyWorker = null;
+
+function runPython(code, { onMessage, onDone, timeoutMs }) {
+  let finished = false;
+  let watchdog = null;
+
+  if (!pyWorker) pyWorker = new Worker(new URL("./pyodideWorker.js", import.meta.url), { type: "module" });
+  const worker = pyWorker;
+
+  const finish = (reason) => {
+    if (finished) return;
+    finished = true;
+    clearTimeout(watchdog);
+    if (reason !== "complete") {
+      worker.terminate();
+      if (pyWorker === worker) pyWorker = null;
+    }
+    onDone?.(reason);
+  };
+
+  worker.onmessage = (e) => (e.data.kind === "done" ? finish("complete") : onMessage?.(e.data));
+  worker.onerror = (e) => {
+    onMessage?.({ kind: "error", args: [e.message] });
+    finish("error");
+  };
+
+  watchdog = setTimeout(() => {
+    onMessage?.({ kind: "error", args: [`Timed out after ${timeoutMs}ms (possible infinite loop) — stopped.`] });
+    finish("timeout");
+  }, timeoutMs);
+
+  worker.postMessage({ kind: "run", code });
+
+  return {
+    stop: () => {
+      onMessage?.({ kind: "warn", args: ["Stopped by user."] });
+      finish("stopped");
+    },
+  };
+}
+
 export function runCode(code, language, { onMessage, onDone, timeoutMs = 5000 } = {}) {
+  if (language === "python") return runPython(code, { onMessage, onDone, timeoutMs: Math.max(timeoutMs, 30000) });
+
   let finished = false;
   let worker = null;
   let url = null;
