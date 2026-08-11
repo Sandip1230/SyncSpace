@@ -120,10 +120,10 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
       setIsDrawing(true);
       setStartPoint(pos);
       addShape(yshapes, { id: genId(), tool, color, strokeWidth, x: pos.x, y: pos.y, width: 0, height: 0 });
-    } else if (tool === "arrow") {
+    } else if (tool === "arrow" || tool === "line") {
       setIsDrawing(true);
       setStartPoint(pos);
-      addShape(yshapes, { id: genId(), tool, color, strokeWidth, points: [pos.x, pos.y, pos.x, pos.y], offsetX: 0, offsetY: 0 });
+      addShape(yshapes, { id: genId(), tool, color, strokeWidth, opacity, points: [pos.x, pos.y, pos.x, pos.y], offsetX: 0, offsetY: 0 });
     }
   };
 
@@ -148,11 +148,9 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
         width: Math.abs(pos.x - startPoint.x),
         height: Math.abs(pos.y - startPoint.y),
       });
-    } else if (last.tool === "arrow" && startPoint) {
-      updateLastShape(yshapes, { points: [startPoint.x, startPoint.y, pos.x, pos.y] });
     } else if ((last.tool === "arrow" || last.tool === "line") && startPoint) {
       updateLastShape(yshapes, { points: [startPoint.x, startPoint.y, pos.x, pos.y] });
-    } 
+    }
   };
 
   const handleMouseUp = () => {

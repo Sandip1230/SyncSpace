@@ -90,7 +90,7 @@ export function detectShape(flatPoints) {
     return null;
   }
 
-  // closed stroke - rectangle or ellipse
+  // closed stroke - ellipse, triangle, diamond, or rectangle
   const bboxArea = width * height;
   const fillRatio = Math.min(1, polygonArea(pts) / bboxArea);
   const corners = countCorners(pts);
@@ -98,7 +98,13 @@ export function detectShape(flatPoints) {
   if (corners <= 2 && fillRatio > 0.62) {
     return { tool: "ellipse", x: minX, y: minY, width, height };
   }
-  if (corners >= 3 && corners <= 6 && fillRatio > 0.55) {
+  if (corners === 3 && fillRatio > 0.3 && fillRatio < 0.6) {
+    return { tool: "triangle", x: minX, y: minY, width, height };
+  }
+  if (corners === 4 && fillRatio > 0.35 && fillRatio < 0.6) {
+    return { tool: "diamond", x: minX, y: minY, width, height };
+  }
+  if (corners >= 3 && corners <= 6 && fillRatio > 0.6) {
     return { tool: "rect", x: minX, y: minY, width, height };
   }
   return null; // ambiguous - leave it as freehand
