@@ -6,7 +6,7 @@ function WorkspaceSidebar({ roomId, users, connected, fileSystem, awareness, isA
   return (
     <div className="workspace-sidebar">
       <div className="workspace-sidebar__pane workspace-sidebar__pane--room">
-        <Sidebar roomId={roomId} users={users} connected={connected} isAdmin={isAdmin} onKickUser={onKickUser} />
+        <Sidebar roomId={roomId} users={users} connected={connected} isAdmin={isAdmin} onKickUser={onKickUser} awareness={awareness} />
       </div>
       <div className="workspace-sidebar__pane workspace-sidebar__pane--explorer">
         <FileExplorer fileSystem={fileSystem} />

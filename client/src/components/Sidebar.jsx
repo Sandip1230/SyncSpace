@@ -2,12 +2,16 @@ import { useState } from "react";
 import socket from "../services/socket";
 import { resolveUserColor } from "../utils/color";
 import { useSettings } from "../context/SettingsContext";
+import { useAwareness } from "../hooks/useAwareness";
 import "./Sidebar.css";
 
-function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
+const ACTIVITY_LABELS = { editing: "Editing", drawing: "Drawing" };
+
+function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser, awareness }) {
   const [copied, setCopied] = useState(false);
   const [kickTarget, setKickTarget] = useState(null); // { socketId, username } | null
   const { settings } = useSettings();
+  const awarenessStates = useAwareness(awareness);
 
   const copyRoomId = () => {
     navigator.clipboard?.writeText(roomId);
@@ -46,7 +50,10 @@ function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
           </div>
           {users.length === 0 && <div className="sidebar__empty">Just you, for now.</div>}
           <div className="sidebar__users">
-            {users.map((u) => (
+            {users.map((u) => {
+              const activity = awarenessStates.find((a) => a.socketId === u.socketId)?.activity;
+              const activityLabel = ACTIVITY_LABELS[activity];
+              return (
               <div key={u.socketId} className={`sidebar__user fade-in ${u.isAdmin ? "sidebar__user--admin" : ""}`}>
                 <span
                   className="sidebar__avatar"
@@ -54,7 +61,10 @@ function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
                 >
                   {(u.username || "?").slice(0, 1).toUpperCase()}
                 </span>
-                <span className="sidebar__username">{u.username}</span>
+                <span className="sidebar__user-info">
+                  <span className="sidebar__username">{u.username}</span>
+                  {activityLabel && <span className="sidebar__activity">{activityLabel}</span>}
+                </span>
                 {u.isAdmin && <span className="sidebar__admin-badge">Admin</span>}
                 {isAdmin && !u.isAdmin && u.socketId !== socket.id && (
                   <button
@@ -67,7 +77,8 @@ function Sidebar({ roomId, users = [], connected, isAdmin, onKickUser }) {
                   </button>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

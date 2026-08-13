@@ -33,6 +33,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
   const textareaRef = useRef(null);
   const cursorPosRef = useRef(null);
   const cursorRafPending = useRef(false);
+  const drawIdleTimer = useRef(null);
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [shapes, setShapes] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -105,6 +106,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
     }
     if (tool === "eraser") {
       setIsDrawing(true);
+      markDrawing();
       eraseAtPoint(yshapes, pos.x, pos.y, ERASER_RADIUS);
       return;
     }
@@ -117,19 +119,33 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
 
     if (FREEHAND_TOOLS.includes(tool)) {
        setIsDrawing(true);
+       markDrawing();
        const id = genId();
        activeStrokeId.current = id;
        addShape(yshapes, { id, tool, color, strokeWidth, points: [pos.x, pos.y], offsetX: 0, offsetY: 0 });
     } else if (BOX_TOOLS.includes(tool)) {
       setIsDrawing(true);
+      markDrawing();
       setStartPoint(pos);
       addShape(yshapes, { id: genId(), tool, color, strokeWidth, x: pos.x, y: pos.y, width: 0, height: 0 });
     } else if (tool === "arrow" || tool === "line") {
       setIsDrawing(true);
+      markDrawing();
       setStartPoint(pos);
       addShape(yshapes, { id: genId(), tool, color, strokeWidth, opacity, points: [pos.x, pos.y, pos.x, pos.y], offsetX: 0, offsetY: 0 });
     }
   };
+
+  const markDrawing = () => {
+    if (!awareness) return;
+    awareness.setLocalStateField("activity", "drawing");
+    clearTimeout(drawIdleTimer.current);
+    drawIdleTimer.current = setTimeout(() => {
+      awareness.setLocalStateField("activity", "idle");
+    }, 2000);
+  };
+
+  useEffect(() => () => clearTimeout(drawIdleTimer.current), []);
 
   const broadcastCursor = (pos) => {
     if (!awareness || !pos) return;
@@ -151,6 +167,7 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
     broadcastCursor(pos);
 
     if (!isDrawing || !yshapes) return;
+    markDrawing();
 
     if (tool === "eraser") {
       eraseAtPoint(yshapes, pos.x, pos.y, ERASER_RADIUS);
