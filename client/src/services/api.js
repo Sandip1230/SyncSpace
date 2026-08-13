@@ -75,3 +75,12 @@ export async function fetchReplayHistory(roomId) {
   const res = await fetch(`${API_BASE_URL}/rooms/${roomId}/history`);
   return handle(res);
 }
+
+export async function askAi({ question, code, language, fileName, errorOutput }) {
+  const res = await fetch(`${API_BASE_URL}/ai/ask`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question, code, language, fileName, errorOutput }),
+  });
+  return handle(res);
+}

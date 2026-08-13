@@ -15,6 +15,7 @@ const authRouter = require("./routes/auth");
 const pingHandler = require("./sockets/pingHandler");
 const replayRouter = require("./routes/replay");
 const chatTypingHandler = require("./sockets/chatTypingHandler");
+const aiRouter = require("./routes/ai");
 
 const PORT = process.env.PORT || 5000;
 const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "*";
@@ -29,6 +30,7 @@ app.get("/health", (req, res) => res.json({ ok: true, uptime: process.uptime() }
 app.use("/api/rooms", roomsRouter);
 app.use("/api/rooms", replayRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/ai", aiRouter);
 
 app.use(notFound);
 app.use(errorHandler);

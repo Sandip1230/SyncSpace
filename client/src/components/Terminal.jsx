@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { runCode } from "../lib/runCode";
 import "./Terminal.css";
 
-function Terminal({ code, language, autoRunToken, onClose }) {
+function Terminal({ code, language, autoRunToken, onClose, onOutputChange }) {
   const [lines, setLines] = useState([]);
   const [running, setRunning] = useState(false);
   const controllerRef = useRef(null);
@@ -31,6 +31,10 @@ function Terminal({ code, language, autoRunToken, onClose }) {
   useEffect(() => {
     if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
   }, [lines]);
+
+  useEffect(() => {
+    onOutputChange?.(lines.map((l) => l.text).join("\n"));
+  }, [lines, onOutputChange]);
 
   useEffect(() => {
     if (autoRunToken) run();

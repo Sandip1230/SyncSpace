@@ -3,6 +3,7 @@ import Editor from "@monaco-editor/react";
 import { MonacoBinding } from "y-monaco";
 import { FileIcon } from "./FileExplorer";
 import Terminal from "./Terminal";
+import AiDoubtBox from "./AiDoubtBox";
 import { isRunnable } from "../lib/fileTree";
 import { useSettings, FONT_FAMILY_STACKS } from "../context/SettingsContext";
 import { useRemoteCursorStyles } from "../hooks/useRemoteCursorStyles";
@@ -21,6 +22,8 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
 
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [runRequest, setRunRequest] = useState(null);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [terminalOutput, setTerminalOutput] = useState("");
 
   const language = activeFile?.language || "plaintext";
   const runnable = isRunnable(language);
@@ -133,6 +136,16 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 7l5 5-5 5M13 17h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             Terminal
           </button>
+
+          <button
+            className={`btn-terminal ${aiOpen ? "is-active" : ""}`}
+            onClick={() => setAiOpen((v) => !v)}
+            disabled={!activeFile}
+            title={activeFile ? "Ask AI about this code" : "Open a file first"}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.9 4.5L18 9l-4.1 1.5L12 15l-1.9-4.5L6 9l4.1-1.5L12 3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+            Ask AI
+          </button>
         </div>
       </div>
 
@@ -185,6 +198,19 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
             onClose={() =>
               setTerminalOpen(false)
             }
+            onOutputChange={setTerminalOutput}
+          />
+        </div>
+      )}
+
+      {aiOpen && (
+        <div className="code-editor__terminal">
+          <AiDoubtBox
+            code={activeText?.toString() ?? ""}
+            language={language}
+            fileName={activeFile?.name}
+            errorOutput={terminalOutput}
+            onClose={() => setAiOpen(false)}
           />
         </div>
       )}
