@@ -386,4 +386,3 @@ function Whiteboard({ yshapes, tool, color, strokeWidth, onToolChange, autoShape
 }
 
 export default Whiteboard;
-
