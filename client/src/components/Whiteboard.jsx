@@ -12,7 +12,7 @@ const ERASER_RADIUS = 14;
 
 const CURSOR_BY_TOOL = {
   select: "default",
-  text: "text"
+  text: "text",
   eraser: "cell",
   pen: "crosshair",
   rect: "crosshair",
