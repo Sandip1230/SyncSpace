@@ -7,6 +7,7 @@ import AiDoubtBox from "./AiDoubtBox";
 import { isRunnable } from "../lib/fileTree";
 import { useSettings, FONT_FAMILY_STACKS } from "../context/SettingsContext";
 import { useRemoteCursorStyles } from "../hooks/useRemoteCursorStyles";
+import { usePanelResize } from "../hooks/usePanelResize";
 import "./CodeEditor.css";
 
 function CodeEditor({ ydoc, fileSystem, awareness }) {
@@ -24,6 +25,8 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
   const [runRequest, setRunRequest] = useState(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [terminalOutput, setTerminalOutput] = useState("");
+  const terminalPanel = usePanelResize({ defaultHeight: 200 });
+  const aiPanel = usePanelResize({ defaultHeight: 200 });
 
   const language = activeFile?.language || "plaintext";
   const runnable = isRunnable(language);
@@ -188,7 +191,12 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
       </div>
 
       {terminalOpen && (
-        <div className="code-editor__terminal">
+        <div className="code-editor__terminal" style={{ height: terminalPanel.height }}>
+          <div
+            className={`code-editor__panel-resizer ${terminalPanel.resizing ? "is-resizing" : ""}`}
+            onMouseDown={terminalPanel.onDragStart}
+            onTouchStart={terminalPanel.onDragStart}
+          />
           <Terminal
             code={runRequest?.code ?? ""}
             language={
@@ -204,7 +212,12 @@ function CodeEditor({ ydoc, fileSystem, awareness }) {
       )}
 
       {aiOpen && (
-        <div className="code-editor__terminal">
+        <div className="code-editor__terminal" style={{ height: aiPanel.height }}>
+          <div
+            className={`code-editor__panel-resizer ${aiPanel.resizing ? "is-resizing" : ""}`}
+            onMouseDown={aiPanel.onDragStart}
+            onTouchStart={aiPanel.onDragStart}
+          />
           <AiDoubtBox
             code={activeText?.toString() ?? ""}
             language={language}

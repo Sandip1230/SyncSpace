@@ -21,7 +21,7 @@ export function useRemoteCursorStyles(awareness, localClientId) {
       const rules = [];
       awareness.getStates().forEach((state, clientId) => {
         if (clientId === localClientId || !state.user) return;
-        const color = state.user.color || "#3fc6d6";
+        const color = state.user.color || "#328993";
         const name = escapeForCssString(state.user.name || "Anonymous");
         rules.push(`
           .yRemoteSelection-${clientId} { background-color: ${color}33; }
