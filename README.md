@@ -58,12 +58,14 @@ npm run seed:dev
 npm run dev
 ## 2. Set up the frontend
 ## bash
+
 cd client
 npm install
 
 Create client/.env:
 
 ## env
+
 VITE_SOCKET_URL=http://localhost:5000
 VITE_API_URL=http://localhost:5000/api
 
