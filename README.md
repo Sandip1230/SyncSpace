@@ -4,6 +4,7 @@ A real-time collaborative whiteboard and code editor for distributed engineering
 teams — draw architecture diagrams and write code side by side, live, with
 multiple people editing at once.
 
+
 Built on the MERN stack, SyncSpace goes beyond standard CRUD apps by solving a
 harder problem: how do you let two people edit the same canvas or the same line
 of code at the exact same millisecond, without lag, race conditions, or one
